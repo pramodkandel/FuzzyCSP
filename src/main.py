@@ -52,10 +52,25 @@ def main_wrapper(opts, args):
 
     problem = FuzzyCSProblem(variables,domains, constraints)
 
-    print "Variables are", problem.get_vars()
+    print "Variables are", problem.get_variables()
+    print "Vars per constraint are", problem.get_num_vars_per_constraint()
 
     solution = FuzzyCSSolution(problem)
     print "Pruning is", solution.get_pruning()
+
+#    appr_vars = ['f','s']
+#    appr_vals = ['S', 'W']
+#    appr = solution.get_appropriateness(appr_vars, appr_vals)
+#    print "Appr value is", appr
+
+#    diff_var = 'f'
+#    diff_fixed = {}
+#    difficulty_and_appr = solution.get_difficulty_and_appr(diff_var, diff_fixed)
+#    print "Difficulty is", difficulty_and_appr[0]
+#    print "Appr is", difficulty_and_appr[1]
+
+    best_solution = solution.heuristic_search()
+    print "Best solution is", best_solution
 
 if __name__ == "__main__":
     sys.exit(main())
