@@ -1,5 +1,5 @@
 class FuzzyCSSolution:
-	def __init__(self, problem, joint_constraint_type = 'product', do_pruning = False ):
+	def __init__(self, problem, joint_constraint_type = 'productive', do_pruning = False ):
 		self.problem = problem
 		self.joint_constraint_type = joint_constraint_type
 		self.do_pruning = do_pruning
@@ -17,88 +17,118 @@ class FuzzyCSSolution:
 		return self.do_pruning
 
 
+######JOINT CONSTRAINT SATISFACTION #########
 
-	#The method definition here works for binary CSPs only
-	def get_appropriateness(self, variables, values):
-		print "Getting appropriateness for variables", variables, "and values", values
-		constraints = self.get_individual_constraints(variables, values)
-		
-		if len(constraints) == 0:
-			return 0
-		var_indices = []
-		for variable in variables:
-			var_ind = self.problem.variables.index(variable)
-			var_indices.append(var_ind)
-		appr = self.find_best_joint_satisfaction(constraints, var_indices)
-		return appr
+	def get_joint_satisfaction_degree(self, instantiation):
+		#first check that instantiation is the right size
+		return self.get_joint_constraint_satisfaction_degree(self.problem.constraints, instantiation)
 
-
-	#return individual constraints with given variables taking given values
-	#both given as a list
-	def get_individual_constraints(self, variables, values):
-		constraints = []
-		for constraint in self.problem.constraints:
-			satisfy = True
-			for i in range(len(variables)):
-				variable = variables[i]
-				var_ind = self.problem.variables.index(variable)
-				value = values[i]
-				satisfy = (constraint[var_ind] == value) and satisfy
-				if not(satisfy):
-					break
-			if satisfy:
-				constraints.append(constraint)
-		return constraints
-
-
-	#works for binary, but can be extended later on
-	def find_best_joint_satisfaction(self, constraints, var_indices):
-		print "Matched constraints are", constraints
-		#print "Var indices fixed for joint_satisfaction are", var_indices
-
-		num_vars_per_constraint = self.problem.get_num_vars_per_constraint()
-		prob_constraints = self.problem.constraints
-		if len(var_indices) == num_vars_per_constraint: #there will be just one constraint
-			if len(constraints)>1:
-				raise FCSSolutionException('Something is wrong. Look into find_best_joint_satisfaction function.')
-			return prob_constraints[constraints[0]]
-
-		#for binary, we eliminated 2 vars above. So, now we only have case for one variable
-		best_num_values = {}
-		for i in range(len(self.problem.variables)):
-			if i not in var_indices:
-				best_num_values[i] = 0
-
-
+	#for the new constraint model
+	def get_joint_constraint_satisfaction_degree(self, constraints, instantiation):
+		#TODO:first check that instantiation is the right size
+		joint_satisfaction = 0.
+		indiv_satisfaction_list = []
 		for constraint in constraints:
-			for val_ind in range(len(constraint)):
-				var_val = constraint[val_ind]
-				if (var_val != None) and (val_ind not in var_indices):
-					constraint_sat_num = prob_constraints[constraint]
-					if constraint_sat_num > best_num_values[val_ind]:
-						best_num_values[val_ind] = constraint_sat_num
+			indiv_satisfaction = self.get_constraint_satisfaction_degree(constraint, instantiation)
+			indiv_satisfaction_list.append(indiv_satisfaction)
 
-		#print "Best satisfaction values are", best_num_values
+		if len(indiv_satisfaction_list) == 0:
+			return 0.
 
-		if self.joint_constraint_type == 'product':
+		if self.joint_constraint_type == 'productive':
 			#multiply each of them
-			ret_val = 1.0
-			for best_sat_key in best_num_values.keys():
-				best_val = best_num_values[best_sat_key]
-				ret_val *= best_val
-			return ret_val
+			joint_satisfaction = 1.0
+			for satisfaction in indiv_satisfaction_list:
+				joint_satisfaction *= satisfaction
 		elif self.joint_constraint_type == 'average':
-			ret_val = 0
-			for best_sat_key in best_num_values:
-				best_val = best_num_values[best_sat_key]
-				ret_val += best_val
-			return ret_val/float(len(best_num_values))
+			for satisfaction in indiv_satisfaction_list:
+				joint_satisfaction += satisfaction
+			joint_satisfaction = joint_satisfaction/float(len(indiv_satisfaction_list))
 
 		elif self.joint_constraint_type == 'min':
-			return min(best_num_values.values())
+			joint_satisfaction = min(indiv_satisfaction_list)
 
 		else:
 			raise FCSSolutionException('Input the correct joint satisfaction type')
+
+		return joint_satisfaction
+
+
+	#for the new constraint model
+	def get_constraint_satisfaction_degree(self,constraint, instantiation):
+		#TODO:check that the instantiation is of right length
+		satisfaction = 0.
+		for fuzzy_assignment in constraint.keys():
+			satisfies = True
+			for i in range(len(fuzzy_assignment)):
+				if fuzzy_assignment[i] != instantiation[i]:
+					if fuzzy_assignment[i] != None:
+						satisfies = False
+						break
+
+			if satisfies == True:
+				satisfaction = constraint[fuzzy_assignment]
+				break
+		return satisfaction
+
+
+		for i in range(len(constraint)):
+			if constraint[i] != instantiation[i]:
+				if constraint[i] != None:
+					return False
+		return True
+
+####### END OF JOINT CONSTRAINT SATISFACTION ###################
+
+######## START OF APPROPRIATENESS VALUE ###################
+
+
+	def get_all_possible_instantiations(self,fixed_vars, fixed_values):
+		import itertools
+		instantiations = []
+		#TODO: Check if fixed_vars and fixed_values are same length
+
+		#first fix the values of variables
+		reduced_domains = self.problem.domains[:]
+		for i in range(len(fixed_vars)):
+			var = fixed_vars[i]
+			value = fixed_values[i]
+			var_ind = self.problem.variables.index(var)
+			reduced_domains[var_ind] = (value)
+
+		#now use the magic of itertools to get all possible instantiations
+		for instance in itertools.product(*reduced_domains):
+			instantiations.append(instance)
+		return instantiations
+
+	def get_constraints_with_variables(self, variables):
+		reduced_constraints = []
+		for constraint in self.problem.constraints:
+			#if any of the variables have None as their value in the constraint
+			constraint_assignment = constraint.keys()[0]; #an example assignment
+			all_vars_satisfy = True
+			for var in variables:
+				var_ind = self.problem.variables.index(var)
+				if constraint_assignment[var_ind] == None:
+					all_vars_satisfy = False
+					break
+			if all_vars_satisfy:
+				reduced_constraints.append(constraint)
+		return reduced_constraints
+
+	#TODO: is there a better way?
+	def get_appropriateness(self, variables, values):
+		all_instances = self.get_all_possible_instantiations(variables, values)
+		all_constraints = self.get_constraints_with_variables(variables)
+		#print "All instances for appropriateness are", all_instances
+		#print "All constraints for appropriateness are", all_constraints
+		best_joint_sat = 0
+		for instance in all_instances:
+			joint_sat = self.get_joint_constraint_satisfaction_degree(all_constraints, instance)
+			if joint_sat > best_joint_sat:
+				best_joint_sat = joint_sat
+		return best_joint_sat
+
 
 
 	#fixed_vars is a dictionary of keys as variables and values as 
@@ -153,31 +183,6 @@ class FuzzyCSSolution:
 				best_assignment = assignment
 		return best_assignment
 
-	#this is the productive joint satisfaction (may need to change to LOG for big problems because decimals will fade)
-	def get_joint_satisfaction_degree(self, instantiation):
-		#first check that instantiation is the right size
-		if len(instantiation) != len(self.problem.variables):
-			raise FCSSolutionException('Instantiation is of different length than the variables.')
-
-		return_score = 1
-		valid_instance = False
-		for constraint in self.problem.constraints.keys():
-			if self.is_constraint_in_instance(constraint, instantiation): #this instantiation has this constraint values
-				valid_instance = True
-				return_score *= self.problem.constraints[constraint]
-		return return_score
-
-
-	#THIS IS O(N). IS THERE A BETTER WAY?
-	def is_constraint_in_instance(self, constraint, instantiation):
-		if len(constraint) != len(instantiation):
-			raise FCSSolutionException('Instantiation is of different length than the constraint.')
-
-		for i in range(len(constraint)):
-			if constraint[i] != instantiation[i]:
-				if constraint[i] != None:
-					return False
-		return True
 
 
 

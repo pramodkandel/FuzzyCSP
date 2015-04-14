@@ -50,27 +50,58 @@ def main_wrapper(opts, args):
                     (None, 'G', 'W'):0.6
                   }
 
-    problem = FuzzyCSProblem(variables,domains, constraints)
+    new_constraints = [
+               {('S','D', None):1.0, 
+                ('S','B',None):0.4,
+                ('S','G',None):0.2,
+                ('C','G',None):0.8,
+                ('C','B',None):0.5},
+               {('S', None, 'L'):1.0,
+                ('S', None, 'W'):0.7,
+                ('C', None, 'W'):1.0,
+                ('C', None, 'L'):0.1},
+               {(None, 'D', 'W'):1.0,
+                (None, 'D', 'L'):0.7,
+                (None, 'B', 'W'):1.0,
+                (None, 'B', 'L'):0.4,
+                (None, 'G', 'L'):1.0,
+                (None, 'G', 'W'):0.6}
+                ]
+
+    problem = FuzzyCSProblem(variables,domains, new_constraints)
 
     print "Variables are", problem.get_variables()
     print "Vars per constraint are", problem.get_num_vars_per_constraint()
 
     solution = FuzzyCSSolution(problem)
     print "Pruning is", solution.get_pruning()
-
-#    appr_vars = ['f','s']
-#    appr_vals = ['S', 'W']
-#    appr = solution.get_appropriateness(appr_vars, appr_vals)
-#    print "Appr value is", appr
-
-#    diff_var = 'f'
-#    diff_fixed = {}
-#    difficulty_and_appr = solution.get_difficulty_and_appr(diff_var, diff_fixed)
-#    print "Difficulty is", difficulty_and_appr[0]
-#    print "Appr is", difficulty_and_appr[1]
-
     best_solution = solution.heuristic_search()
-    print "Best solution is", best_solution
+    print "best solution is", best_solution
+
+
+'''
+    appr_vars = ['f','s']
+    appr_vals = ['S','W']
+
+    appr = solution.get_appropriateness(appr_vars, appr_vals)
+    print "Appr value is", appr
+
+    diff_var = 'f'
+    diff_fixed = {}
+    difficulty_and_appr = solution.get_difficulty_and_appr(diff_var, diff_fixed)
+    print "Difficulty is", difficulty_and_appr[0]
+    print "Appr is", difficulty_and_appr[1]
+
+
+    instant = ('S','D','W')
+    joint_sat = solution.get_joint_satisfaction_degree(instant)
+    print "joint_sat is", joint_sat
+
+    fixed_vars = ['t']
+    fixed_vals = ['D']
+    instances = solution.get_all_possible_instantiations(fixed_vars, fixed_vals)
+    print "Possible instances are", instances
+'''
 
 if __name__ == "__main__":
     sys.exit(main())

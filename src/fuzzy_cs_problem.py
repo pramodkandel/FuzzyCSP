@@ -19,8 +19,12 @@ class FuzzyCSProblem:
 	def get_constraints(self):
 		return self.constraints
 
+	def get_num_constraints(self):
+		return len(self.constraints)
+
 	def set_num_vars_per_constraint(self):
-		constraint = self.constraints.keys()[0]
+		#constraint = self.constraints.keys()[0]
+		constraint = self.constraints[0].keys()[0]
 		num_vars = 0
 		for value in constraint:
 			if value != None:
