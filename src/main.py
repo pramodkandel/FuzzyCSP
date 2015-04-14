@@ -32,25 +32,7 @@ def main_wrapper(opts, args):
 
     domains = [('S', 'C'),('D', 'B', 'G'),('L', 'W')]
 
-    constraints = {
-                    ('S','D', None):1.0, 
-                    ('S','B',None):0.4,
-                    ('S','G',None):0.2,
-                    ('C','G',None):0.8,
-                    ('C','B',None):0.5,
-                    ('S', None, 'L'):1.0,
-                    ('S', None, 'W'):0.7,
-                    ('C', None, 'W'):1.0,
-                    ('C', None, 'L'):0.1,
-                    (None, 'D', 'W'):1.0,
-                    (None, 'D', 'L'):0.7,
-                    (None, 'B', 'W'):1.0,
-                    (None, 'B', 'L'):0.4,
-                    (None, 'G', 'L'):1.0,
-                    (None, 'G', 'W'):0.6
-                  }
-
-    new_constraints = [
+    constraints = [
                {('S','D', None):1.0, 
                 ('S','B',None):0.4,
                 ('S','G',None):0.2,
@@ -68,7 +50,7 @@ def main_wrapper(opts, args):
                 (None, 'G', 'W'):0.6}
                 ]
 
-    problem = FuzzyCSProblem(variables,domains, new_constraints)
+    problem = FuzzyCSProblem(variables,domains, constraints)
 
     print "Variables are", problem.get_variables()
     print "Vars per constraint are", problem.get_num_vars_per_constraint()
