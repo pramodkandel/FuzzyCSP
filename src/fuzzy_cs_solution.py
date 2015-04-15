@@ -119,7 +119,10 @@ class FuzzyCSSolution:
 	#TODO: is there a better way?
 	def get_appropriateness(self, variables, values):
 		all_instances = self.get_all_possible_instantiations(variables, values)
-		all_constraints = self.get_constraints_with_variables(variables)
+		if len(variables) > self.problem.get_num_vars_per_constraint(): 
+			all_constraints = self.problem.get_constraints()[:]
+		else:
+			all_constraints = self.get_constraints_with_variables(variables)
 		#print "All instances for appropriateness are", all_instances
 		#print "All constraints for appropriateness are", all_constraints
 		best_joint_sat = 0
@@ -172,6 +175,12 @@ class FuzzyCSSolution:
 
 			#now instantiate the var_to_set
 			fixed_vars[var_to_set] = self.get_best_appr_var_assignment(best_appr_dict)
+
+		#make sure it's a full assignment
+		assert len(fixed_vars) == len(self.problem.get_variables())
+		#make sure none of the assigned values is None
+		assert None not in fixed_vars.values()
+
 		return fixed_vars
 
 	def get_best_appr_var_assignment(self, best_appr_dict):
@@ -184,6 +193,19 @@ class FuzzyCSSolution:
 		return best_assignment
 
 
+
+
+
+	def get_solution_instance_with_joint_sat(self):
+		solution = self.heuristic_search()
+		instance = [None] * len(solution)
+
+		for variable in self.problem.get_variables():
+			instance.append(solution[variable])
+
+		instance = tuple(instance)
+		joint_sat = self.get_joint_satisfaction_degree(instance)
+		return instance, joint_sat
 
 
 

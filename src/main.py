@@ -60,22 +60,22 @@ def main_wrapper(opts, args):
     best_solution = solution.heuristic_search()
     print "best solution is", best_solution
 
-
 '''
-    appr_vars = ['f','s']
-    appr_vals = ['S','W']
+
+    appr_vars = ['f','t', 's']
+    appr_vals = ['S','D', 'W']
 
     appr = solution.get_appropriateness(appr_vars, appr_vals)
     print "Appr value is", appr
 
-    diff_var = 'f'
-    diff_fixed = {}
+    diff_var = 's'
+    diff_fixed = {'f':'S', 't':'D'}
     difficulty_and_appr = solution.get_difficulty_and_appr(diff_var, diff_fixed)
     print "Difficulty is", difficulty_and_appr[0]
     print "Appr is", difficulty_and_appr[1]
 
 
-    instant = ('S','D','W')
+    instant = ('S','D','L')
     joint_sat = solution.get_joint_satisfaction_degree(instant)
     print "joint_sat is", joint_sat
 
