@@ -1,8 +1,10 @@
 class FuzzyCSSolution:
-	def __init__(self, problem, joint_constraint_type = 'productive', do_pruning = False ):
+	def __init__(self, problem, joint_constraint_type = 'productive', do_branch_and_bound = False ):
 		self.problem = problem
 		self.joint_constraint_type = joint_constraint_type
-		self.do_pruning = do_pruning
+		self.do_branch_and_bound = do_branch_and_bound
+		self.search_tree = None
+
 
 	def set_joint_constraint_type(self, constraint_type):
 		self.joint_constraint_type = constraint_type
@@ -16,6 +18,29 @@ class FuzzyCSSolution:
 	def get_pruning(self):
 		return self.do_pruning
 
+	#useful for backtracking, b&b, and similar
+	#algorithms that require exploring tree
+	def get_search_tree(self):
+		#if function previously called, return the tree
+		if self.search_tree != None:
+			return self.search_tree
+
+		tree = {}
+		variables = self.problem.get_variables()
+		for i in range(len(variables)):
+			var = variables[i]
+			values = self.problem.get_domain(var)
+			if i == len(variables)-1: #last variable in the list
+				children = []
+			else:
+				children = self.problem.get_domain(variables[i+1])
+
+			#now put children for each value of this variable
+			for value in values:
+				tree[value] = children
+		#set the search tree for this instance
+		self.search_tree = tree
+		return tree
 
 ######JOINT CONSTRAINT SATISFACTION #########
 
@@ -170,6 +195,13 @@ class FuzzyCSSolution:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
+
+					if difficulty == 0: 
+						#this means appropriateness is 0 for all values, i.e. constraints violated
+						#TODO: Backtracking, i.e. go to previous variable, and consider values other than the one. 
+						# in the fixed_vars. May need to decrease domain of the variable. Is it needed?
+						#backtrack only if appropriateness of this variable without any value is >0
+						pass
 			if best_appr_dict == None:
 				raise FCSSolutionException('Code should not come here. Look at heuristic_search function.')
 
@@ -196,18 +228,51 @@ class FuzzyCSSolution:
 
 
 
-	def get_solution_instance_with_joint_sat(self):
+	def get_best_heuristic_solution_and_joint_sat(self):
 		solution = self.heuristic_search()
 		instance = [None] * len(solution)
 
-		for variable in self.problem.get_variables():
-			instance.append(solution[variable])
+		for i in range(len(self.problem.get_variables())):
+			variable = self.problem.get_variables()[i]
+			instance[i] = solution[variable]
+
+		#make sure there is no None assigned for any variable
+		assert None not in instance
 
 		instance = tuple(instance)
 		joint_sat = self.get_joint_satisfaction_degree(instance)
 		return instance, joint_sat
 
 
+	#backtracking with dfs, so the returned solution really depends on 
+	#the order of variables provided.
+	def get_feasible_solution_with_backtracking(self):
+		graph = self.get_search_tree()
+		root_variable = self.problem.get_variables()[0]
+		root_values = self.problem.get_domain(root_variable)
+		
+		#standard dfs
+		solution, stack = [], list(root_values)
+		while stack:
+			vertex = stack.pop(0)
+			if vertex not in solution:
+				if self.is_partial_assignment_consistent(tuple(solution+[vertex])):
+					solution.append(vertex)
+					stack = list(graph[vertex]) + stack
+
+					if graph[vertex] == []: #it's a leaf, so a solution is attended
+						return tuple(solution)
+
+				#else backtrack, which is automatic
+		return False
+
+
+	#partial assignment is tuples of partial assignment from first
+	#variable to variable number len(partial_assignment)-1
+	def is_partial_assignment_consistent(self, partial_assignment):
+		#right now, see if the appropriateness of this partial_assignment exists
+		#but can have different implementations
+		return True
 
 class FCSSolutionException(Exception):
     def __init__(self, msg):

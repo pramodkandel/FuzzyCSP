@@ -51,16 +51,21 @@ def main_wrapper(opts, args):
                 ]
 
     problem = FuzzyCSProblem(variables,domains, constraints)
+    solution = FuzzyCSSolution(problem)
+    best_solution, joint_sat = solution.get_best_heuristic_solution_and_joint_sat()
 
+    print "Best solution is", best_solution
+    print "Joint satisfaction degree is", joint_sat
+
+    backtrack_solution = solution.get_feasible_solution_with_backtracking()
+    print "backtrack_solution is", backtrack_solution
+'''
     print "Variables are", problem.get_variables()
     print "Vars per constraint are", problem.get_num_vars_per_constraint()
 
-    solution = FuzzyCSSolution(problem)
-    print "Pruning is", solution.get_pruning()
-    best_solution = solution.heuristic_search()
     print "best solution is", best_solution
 
-'''
+
 
     appr_vars = ['f','t', 's']
     appr_vals = ['S','D', 'W']
