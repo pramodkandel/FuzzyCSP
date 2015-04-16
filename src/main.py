@@ -50,8 +50,23 @@ def main_wrapper(opts, args):
                 (None, 'G', 'W'):0.6}
                 ]
 
+    heuristic_backtrack_constraints =[
+               {('S','D', None):1.0, 
+                ('S','G',None):1.0,
+                ('C','B',None):0.5},
+               {('S', None, 'W'):1.0,
+                ('S', None, 'L'):1.0,
+                ('C', None, 'W'):0.5,
+                ('C', None, 'L'):0.5},
+               {(None, 'B', 'W'):1.0,
+                (None, 'B', 'L'):1.0 }                 
+                ]
+
     problem = FuzzyCSProblem(variables,domains, constraints)
     solution = FuzzyCSSolution(problem)
+
+    problem2 = FuzzyCSProblem(variables, domains, heuristic_backtrack_constraints)
+    solution2 = FuzzyCSSolution(problem2)
 
     print "----------------------------"
     heuristic_solution = solution.get_heuristic_solution()
@@ -76,8 +91,21 @@ def main_wrapper(opts, args):
     all_solutions = solution.get_all_feasible_solutions()
     print "all feasible solutions are", list(all_solutions)
     print "---------------------------------"
-    #print "backtrack_solution is", backtrack_solution
+    print "---------------------------------"
 
+    all_solutions = solution2.get_all_feasible_solutions()
+    print "all feasible solutions 2 are", list(all_solutions)
+    print "---------------------------------"
+
+    heuristic_solution = solution2.get_heuristic_solution()
+    print "Heuristic solution is", heuristic_solution
+    print "Joint satisfaction degree is", solution2.get_joint_satisfaction_degree(heuristic_solution)
+    print "---------------------------"
+
+    bnb_solution = solution2.get_branch_and_bound_solution()
+    print "branch_n_bound solution is", bnb_solution
+    print "joint_sat of branch_n_bound is", solution2.get_joint_satisfaction_degree(bnb_solution)
+    print "--------------------------------"
 
 '''
     print "Variables are", problem.get_variables()

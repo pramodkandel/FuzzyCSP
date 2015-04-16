@@ -209,12 +209,17 @@ class FuzzyCSSolution:
 					if variable in backtracked_assignments:
 						ignore_values = backtracked_assignments[variable]
 					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars, ignore_values)
+					#print "difficulty_and_appr of variables",variable,"with fixed vars:", fixed_vars, "are:\n", difficulty, appr_dict
 					if difficulty<least_diff:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
 
-					if difficulty == 0: 
+					if difficulty == 0: #will it ever happen?
+						#this means appropriateness is 0 for all values, i.e. constraints violated
+						#i.e. we need backtracking, i.e. go to previous variable, and consider values other than the one. 
+						# in the fixed_vars.
+						
 						#pop the latest variable from assigned and 
 						#fixed_vars and do the same thing with reduced domain
 						#also need to see if the domain has been reduced to empty set
@@ -227,12 +232,6 @@ class FuzzyCSSolution:
 							backtracked_assignments[latest_variable] = backtracked_values.append(assigned_val)
 						#remove from fixed_vals
 						del fixed_vars[latest_variable]
-
-
-						#this means appropriateness is 0 for all values, i.e. constraints violated
-						#TODO: Backtracking, i.e. go to previous variable, and consider values other than the one. 
-						# in the fixed_vars. May need to decrease domain of the variable. Is it needed?
-						#backtrack only if appropriateness of this variable without any value is >0
 						break
 			if best_appr_dict == None:
 				raise FCSSolutionException('Code should not come here. Look at heuristic_search function.')
@@ -329,13 +328,15 @@ class FuzzyCSSolution:
 		#create initial stack with the root variables
 		stack = []
 		for root_val in root_values:
-			stack.append((root_val, [root_val]))
+			to_add = (root_val, [root_val])
+			#stack = [to_add]+stack
+			stack.append(to_add)
 
 		while stack:
-			print "stack is", stack
+			#print "stack is", stack
 			(vertex, path) = stack.pop(0)
-			print "vertex is", vertex
-			print "path is", path
+			#print "vertex is", vertex
+			#print "path is", path
 			for next in graph[vertex]:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
@@ -348,7 +349,10 @@ class FuzzyCSSolution:
 					continue
 
 				if graph[next] == []: # next vertex is the leaf
-					yield tuple(path + [next])
+					instance = tuple(path + [next])
+					joint_sat = self.get_joint_satisfaction_degree(instance)
+					if joint_sat >= alpha:
+						yield tuple(path + [next])
 				else:
 					stack = [(next, path+[next])] + stack
 
