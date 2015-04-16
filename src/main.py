@@ -64,11 +64,14 @@ def main_wrapper(opts, args):
     print "joint_sat of branch_n_bound is", solution.get_joint_satisfaction_degree(bnb_solution)
     print "--------------------------------"
 
-    alpha = 0.4
+    alpha = 0.7
     alpha_solutions = solution.get_alpha_solutions(alpha)
     print "all alpha solutions with alpha:",alpha, "are", list(alpha_solutions)
     print "---------------------------"
 
+    feasible_solution = solution.get_a_feasible_solution()
+    print "a feasible solution is", feasible_solution
+    print "------------------------------"
 
     all_solutions = solution.get_all_feasible_solutions()
     print "all feasible solutions are", list(all_solutions)

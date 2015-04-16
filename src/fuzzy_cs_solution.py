@@ -171,12 +171,14 @@ class FuzzyCSSolution:
 
 	#fixed_vars is a dictionary of keys as variables and values as 
 	#corresponding fixed values of those variables
-	def get_difficulty_and_appr(self, variable, fixed_vars):
+	def get_difficulty_and_appr(self, variable, fixed_vars, ignore_values):
 		domain = self.problem.get_domain(variable)
 		fixed_variables = fixed_vars.keys()
 		appr_dict = {}
 		difficulty = 0
 		for value in domain:
+			if value in ignore_values:
+				continue
 			appr_variables = fixed_variables + [variable]
 			appr_values = []
 			for fixed_var in fixed_variables:
@@ -191,33 +193,53 @@ class FuzzyCSSolution:
 
 
 
+
 	def heuristic_search(self):
 		variables = self.problem.variables
 		fixed_vars = {}
+		assigned_vars = []
+		backtracked_assignments = {}
 		while len(fixed_vars)<len(variables):
 			best_appr_dict = None
 			least_diff = float('inf')
 			var_to_set = None
 			for variable in variables:
 				if variable not in fixed_vars:
-					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars)
+					ignore_values = []
+					if variable in backtracked_assignments:
+						ignore_values = backtracked_assignments[variable]
+					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars, ignore_values)
 					if difficulty<least_diff:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
 
 					if difficulty == 0: 
+						#pop the latest variable from assigned and 
+						#fixed_vars and do the same thing with reduced domain
+						#also need to see if the domain has been reduced to empty set
+						latest_variable = assigned_vars.pop()
+						assigned_val = fixed_vars[latest_variable]
+
+						#add to backtracked assignments
+						if latest_variable in backtracked_assignments:
+							backtracked_values = backtracked_assignments[latest_variable]
+							backtracked_assignments[latest_variable] = backtracked_values.append(assigned_val)
+						#remove from fixed_vals
+						del fixed_vars[latest_variable]
+
+
 						#this means appropriateness is 0 for all values, i.e. constraints violated
 						#TODO: Backtracking, i.e. go to previous variable, and consider values other than the one. 
 						# in the fixed_vars. May need to decrease domain of the variable. Is it needed?
 						#backtrack only if appropriateness of this variable without any value is >0
-						pass
+						break
 			if best_appr_dict == None:
 				raise FCSSolutionException('Code should not come here. Look at heuristic_search function.')
 
 			#now instantiate the var_to_set
 			fixed_vars[var_to_set] = self.get_best_appr_var_assignment(best_appr_dict)
-
+			assigned_vars.append(var_to_set)
 		#make sure it's a full assignment
 		assert len(fixed_vars) == len(self.problem.get_variables())
 		#make sure none of the assigned values is None
@@ -260,33 +282,42 @@ class FuzzyCSSolution:
 		root_variable = self.problem.get_variables()[0]
 		root_values = self.problem.get_domain(root_variable)		
 
-		best_joint_sat = 0
+		feasible_solution = self.get_a_feasible_solution()
+		best_joint_sat = self.get_joint_satisfaction_degree(feasible_solution)
 
+		best_solution = feasible_solution
 		#create initial stack with the root variables
 		stack = []
 		for root_val in root_values:
 			stack.append((root_val, [root_val]))
 
 		while stack:
+			#print "bnb stack is", stack
 			(vertex, path) = stack.pop(0)
+			#print "bnb vertex is", vertex
+			#print "bnb path is", path
 			for next in graph[vertex]:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
 				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
-				better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
-				if better_joint_sat:
-					#update best_satisfaction_degree
-					best_joint_sat = better_joint_sat[1]
-				else:
+				partial_appr = self.get_appropriateness(partial_vars, next_partial_assignment)
+				#better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
+				
+				if partial_appr < best_joint_sat:
+					#prune/don't go to this branch
 					continue
 					
 				if graph[next] == []: # next vertex is the leaf
 					instance = tuple(path + [next])
-					return instance
+					joint_sat = self.get_joint_satisfaction_degree(instance)
+					if joint_sat > best_joint_sat:
+						best_joint_sat = joint_sat
+					best_solution = instance
+					continue
 				else:
 					stack = [(next, path+[next])] + stack		
 
-
+		return best_solution
 
 	#done with dfs and backtracking. gets all solutions 
 	#with joint satisfaction more than alpha
@@ -301,12 +332,19 @@ class FuzzyCSSolution:
 			stack.append((root_val, [root_val]))
 
 		while stack:
+			print "stack is", stack
 			(vertex, path) = stack.pop(0)
+			print "vertex is", vertex
+			print "path is", path
 			for next in graph[vertex]:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
 				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
-				if not self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, alpha):
+				partial_appr = self.get_appropriateness(partial_vars, next_partial_assignment)
+				#better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
+				
+				if partial_appr < alpha:
+					#prune/don't go to this branch
 					continue
 
 				if graph[next] == []: # next vertex is the leaf
@@ -321,6 +359,10 @@ class FuzzyCSSolution:
 		return self.get_alpha_solutions(sys.float_info.epsilon)
 
 
+	def get_a_feasible_solution(self):
+		import sys
+		for solution in self.get_alpha_solutions(sys.float_info.epsilon):
+			return solution
 	#def get_m_best_solutions(self):
 
 
