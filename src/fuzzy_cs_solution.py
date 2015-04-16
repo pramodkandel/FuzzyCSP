@@ -108,9 +108,10 @@ class FuzzyCSSolution:
 ######## START OF APPROPRIATENESS VALUE ###################
 
 
+	#generator function to yield all instantiations
 	def get_all_possible_instantiations(self,fixed_vars, fixed_values):
 		import itertools
-		instantiations = []
+		#instantiations = []
 		#TODO: Check if fixed_vars and fixed_values are same length
 
 		#first fix the values of variables
@@ -123,8 +124,9 @@ class FuzzyCSSolution:
 
 		#now use the magic of itertools to get all possible instantiations
 		for instance in itertools.product(*reduced_domains):
-			instantiations.append(instance)
-		return instantiations
+			yield instance
+			#instantiations.append(instance)
+		#return instantiations
 
 	def get_constraints_with_variables(self, variables):
 		reduced_constraints = []
@@ -143,7 +145,6 @@ class FuzzyCSSolution:
 
 	#TODO: is there a better way?
 	def get_appropriateness(self, variables, values):
-		all_instances = self.get_all_possible_instantiations(variables, values)
 		if len(variables) > self.problem.get_num_vars_per_constraint(): 
 			all_constraints = self.problem.get_constraints()[:]
 		else:
@@ -151,13 +152,22 @@ class FuzzyCSSolution:
 		#print "All instances for appropriateness are", all_instances
 		#print "All constraints for appropriateness are", all_constraints
 		best_joint_sat = 0
-		for instance in all_instances:
+		for instance in self.get_all_possible_instantiations(variables, values):
 			joint_sat = self.get_joint_constraint_satisfaction_degree(all_constraints, instance)
 			if joint_sat > best_joint_sat:
 				best_joint_sat = joint_sat
 		return best_joint_sat
 
 
+	#similar implementation as get_appropriateness, but returns as soon as it finds 
+	#some joint satisfaction better than or equal to the required threshold alpha
+	def is_joint_satisfaction_better_or_equalto_alpha(self,variables, values, alpha):
+		#we can do this in loop rather than generating all instances before
+		for instance in self.get_all_possible_instantiations(variables, values):
+			joint_sat = self.get_joint_satisfaction_degree(instance)
+			if joint_sat >= alpha:
+				return True, joint_sat
+		return False		
 
 	#fixed_vars is a dictionary of keys as variables and values as 
 	#corresponding fixed values of those variables
@@ -228,7 +238,7 @@ class FuzzyCSSolution:
 
 
 
-	def get_best_heuristic_solution_and_joint_sat(self):
+	def get_heuristic_solution(self):
 		solution = self.heuristic_search()
 		instance = [None] * len(solution)
 
@@ -238,41 +248,81 @@ class FuzzyCSSolution:
 
 		#make sure there is no None assigned for any variable
 		assert None not in instance
-
 		instance = tuple(instance)
-		joint_sat = self.get_joint_satisfaction_degree(instance)
-		return instance, joint_sat
+		return instance
 
 
-	#backtracking with dfs, so the returned solution really depends on 
-	#the order of variables provided.
-	def get_feasible_solution_with_backtracking(self):
+
+	#b&b based on dfs and backtracking. Uses appropriateness value 
+	#as the upper bound while bounding
+	def get_branch_and_bound_solution(self):
 		graph = self.get_search_tree()
 		root_variable = self.problem.get_variables()[0]
-		root_values = self.problem.get_domain(root_variable)
-		
-		#standard dfs
-		solution, stack = [], list(root_values)
+		root_values = self.problem.get_domain(root_variable)		
+
+		best_joint_sat = 0
+
+		#create initial stack with the root variables
+		stack = []
+		for root_val in root_values:
+			stack.append((root_val, [root_val]))
+
 		while stack:
-			vertex = stack.pop(0)
-			if vertex not in solution:
-				if self.is_partial_assignment_consistent(tuple(solution+[vertex])):
-					solution.append(vertex)
-					stack = list(graph[vertex]) + stack
+			(vertex, path) = stack.pop(0)
+			for next in graph[vertex]:
+				#check if the path with next variable has better joint_sat than current max
+				next_partial_assignment = path+[next];
+				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
+				better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
+				if better_joint_sat:
+					#update best_satisfaction_degree
+					best_joint_sat = better_joint_sat[1]
+				else:
+					continue
+					
+				if graph[next] == []: # next vertex is the leaf
+					instance = tuple(path + [next])
+					return instance
+				else:
+					stack = [(next, path+[next])] + stack		
 
-					if graph[vertex] == []: #it's a leaf, so a solution is attended
-						return tuple(solution)
-
-				#else backtrack, which is automatic
-		return False
 
 
-	#partial assignment is tuples of partial assignment from first
-	#variable to variable number len(partial_assignment)-1
-	def is_partial_assignment_consistent(self, partial_assignment):
-		#right now, see if the appropriateness of this partial_assignment exists
-		#but can have different implementations
-		return True
+	#done with dfs and backtracking. gets all solutions 
+	#with joint satisfaction more than alpha
+	def get_alpha_solutions(self, alpha):
+		graph = self.get_search_tree()
+		root_variable = self.problem.get_variables()[0]
+		root_values = self.problem.get_domain(root_variable)		
+
+		#create initial stack with the root variables
+		stack = []
+		for root_val in root_values:
+			stack.append((root_val, [root_val]))
+
+		while stack:
+			(vertex, path) = stack.pop(0)
+			for next in graph[vertex]:
+				#check if the path with next variable has better joint_sat than current max
+				next_partial_assignment = path+[next];
+				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
+				if not self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, alpha):
+					continue
+
+				if graph[next] == []: # next vertex is the leaf
+					yield tuple(path + [next])
+				else:
+					stack = [(next, path+[next])] + stack
+
+
+	def get_all_feasible_solutions(self):
+		import sys
+		#epsilon is the "smallest constant" greater than zero
+		return self.get_alpha_solutions(sys.float_info.epsilon)
+
+
+	#def get_m_best_solutions(self):
+
 
 class FCSSolutionException(Exception):
     def __init__(self, msg):
