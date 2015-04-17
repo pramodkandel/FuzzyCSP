@@ -1,3 +1,5 @@
+import itertools
+
 class FuzzyCSSolution:
 	def __init__(self, problem, joint_constraint_type = 'productive', do_branch_and_bound = False ):
 		self.problem = problem
@@ -57,24 +59,7 @@ class FuzzyCSSolution:
 			indiv_satisfaction = self.get_constraint_satisfaction_degree(constraint, instantiation)
 			indiv_satisfaction_list.append(indiv_satisfaction)
 
-		if len(indiv_satisfaction_list) == 0:
-			return 0.
-
-		if self.joint_constraint_type == 'productive':
-			#multiply each of them
-			joint_satisfaction = 1.0
-			for satisfaction in indiv_satisfaction_list:
-				joint_satisfaction *= satisfaction
-		elif self.joint_constraint_type == 'average':
-			for satisfaction in indiv_satisfaction_list:
-				joint_satisfaction += satisfaction
-			joint_satisfaction = joint_satisfaction/float(len(indiv_satisfaction_list))
-
-		elif self.joint_constraint_type == 'min':
-			joint_satisfaction = min(indiv_satisfaction_list)
-
-		else:
-			raise FCSSolutionException('Input the correct joint satisfaction type')
+		joint_satisfaction = self.get_joint_constraint_sat(indiv_satisfaction_list)
 
 		return joint_satisfaction
 
@@ -103,6 +88,61 @@ class FuzzyCSSolution:
 					return False
 		return True
 
+
+	#the fixed_constraints are specific constraints assignments from the table
+	def get_joint_constraint_sat(self, indiv_constraint_sats):
+		indiv_satisfaction_list = indiv_constraint_sats
+		if len(indiv_satisfaction_list) == 0:
+			return 0.
+
+		if self.joint_constraint_type == 'productive':
+			#multiply each of them
+			joint_satisfaction = 1.0
+			for satisfaction in indiv_satisfaction_list:
+				joint_satisfaction *= satisfaction
+		elif self.joint_constraint_type == 'average':
+			for satisfaction in indiv_satisfaction_list:
+				joint_satisfaction += satisfaction
+			joint_satisfaction = joint_satisfaction/float(len(indiv_satisfaction_list))
+
+		elif self.joint_constraint_type == 'min':
+			joint_satisfaction = min(indiv_satisfaction_list)
+
+		else:
+			raise FCSSolutionException('Input the correct joint satisfaction type')
+
+		return joint_satisfaction
+
+	def get_partial_joint_satisfaction(self, partial_vars, partial_values):
+		#create a dictionary for values and vars:
+		partial_assignment_dict = {}
+		for i in range(len(partial_vars)):
+			variable = partial_vars[i]
+			value = partial_values[i]
+			partial_assignment_dict[variable] = value
+
+		constraint_vars = []
+		indiv_constraint_sats = []
+		#first get all combinations of these partial_vars
+		print "partial vars is", partial_vars
+		num_vars_per_constraint = self.problem.get_num_vars_per_constraint()
+		print "num_vars_per_constraint is", num_vars_per_constraint
+		if len(partial_vars) < num_vars_per_constraint:
+			#for each constraint, find the maximum one that contains these variables
+			#TODO
+			pass
+		else:
+			all_constraint_vars = itertools.combinations(partial_vars, num_vars_per_constraint)
+
+			for constraint_var in all_constraint_vars:
+				var_list = list(constraint_var)
+				value_list = [partial_assignment_dict[var] for var in var_list]
+				#print "The var_list and value_list are", var_list, value_list
+				constraint_sat = self.get_constraints_sat_with_fixed_vars(var_list, value_list)
+				indiv_constraint_sats.append(constraint_sat)
+
+		return self.get_joint_constraint_sat(indiv_constraint_sats)
+
 ####### END OF JOINT CONSTRAINT SATISFACTION ###################
 
 ######## START OF APPROPRIATENESS VALUE ###################
@@ -110,7 +150,6 @@ class FuzzyCSSolution:
 
 	#generator function to yield all instantiations
 	def get_all_possible_instantiations(self,fixed_vars, fixed_values):
-		import itertools
 		#instantiations = []
 		#TODO: Check if fixed_vars and fixed_values are same length
 
@@ -143,6 +182,32 @@ class FuzzyCSSolution:
 			if all_vars_satisfy:
 				reduced_constraints.append(constraint)
 		return reduced_constraints
+
+
+	#each fixed var must be same as num_vars_per_constraint
+	#the values are as if the key to a constraint dictionary
+	def get_constraints_sat_with_fixed_vars(self, variables, values):
+		#first assert that the length of variables is same as num_vars_per_constraint
+		assert len(variables) == self.problem.num_vars_per_constraint
+		problem_variables = self.problem.variables
+		problem_var_indices = [problem_variables.index(var) for var in problem_variables]
+
+		#create constraint key
+		constraint_key_list = [None]*len(problem_variables)
+		for i in range(len(variables)):
+			var = variables[i]
+			value = values[i]
+			problem_var_ind = problem_variables.index(var)
+			constraint_key_list[problem_var_ind] = value
+		constraint_key = tuple(constraint_key_list)
+
+		#now find a specific constraint key and return the satisfaction
+		return_sat = 0
+		for constraint in self.problem.constraints:
+			if constraint_key in constraint:
+				return_sat = constraint[constraint_key]
+				break
+		return return_sat
 
 	#TODO: is there a better way?
 	def get_appropriateness(self, variables, values):
@@ -214,12 +279,13 @@ class FuzzyCSSolution:
 						ignore_values = backtracked_assignments[variable]
 					#print "The variable, fixed vars, and ignore_values are", variable, fixed_vars, ignore_values
 					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars, ignore_values)
+
 					#print "difficulty_and_appr of variables",variable,"with fixed vars:", fixed_vars, "are:\n", difficulty, appr_dict
 					if difficulty<least_diff:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
-					#print "difficulty just before 0 check is", 
+					#print "difficulty just before 0 check is", difficulty
 					if difficulty == 0: 
 						#this means appropriateness is 0 for all values, i.e. constraints violated
 						#i.e. we need backtracking, i.e. go to previous variable, and consider values other than the one. 

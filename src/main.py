@@ -69,6 +69,11 @@ def main_wrapper(opts, args):
     problem2 = FuzzyCSProblem(variables, domains, heuristic_backtrack_constraints)
     solution2 = FuzzyCSSolution(problem2)
 
+    partial_vars = ['f','t','s']
+    partial_values = ['S','D','W']
+    partial_joint_sat = solution.get_partial_joint_satisfaction(partial_vars, partial_values)
+    print "Partial joint sat is", partial_joint_sat
+
     print "----------------------------"
     heuristic_solution = solution.get_heuristic_solution()
     print "Heuristic solution is", heuristic_solution
