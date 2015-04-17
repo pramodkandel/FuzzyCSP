@@ -1,6 +1,7 @@
 class FuzzyCSProblem:
 	vars_and_domains = {}
 	num_vars_per_constraint = 0
+
 	def __init__(self, variables,domains, constraints):
 		self.variables = variables
 		self.domains = domains

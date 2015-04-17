@@ -1,11 +1,11 @@
 import itertools
 
 class FuzzyCSSolution:
-	def __init__(self, problem, joint_constraint_type = 'productive', do_branch_and_bound = False ):
+	def __init__(self, problem, joint_constraint_type = 'productive', upper_bound_type = "appropriateness"):
 		self.problem = problem
 		self.joint_constraint_type = joint_constraint_type
-		self.do_branch_and_bound = do_branch_and_bound
 		self.search_tree = None
+		self.upper_bound_type = upper_bound_type #can be "partial_joint_sat" or "appropriateness"
 
 
 	def set_joint_constraint_type(self, constraint_type):
@@ -14,11 +14,13 @@ class FuzzyCSSolution:
 	def get_joint_constraint_type(self):
 		return self.joint_constraint_type
 
-	def set_pruning(self, boolean):
-		self.do_pruning = boolean
 
-	def get_pruning(self):
-		return self.do_pruning
+	def get_upper_bound_type(self):
+		return self.upper_bound_type
+
+	def set_upper_bound_type(self, upper_bound_type):
+		self.upper_bound_type = upper_bound_type
+
 
 	#useful for backtracking, b&b, and similar
 	#algorithms that require exploring tree
@@ -130,7 +132,7 @@ class FuzzyCSSolution:
 		if len(partial_vars) < num_vars_per_constraint:
 			#for each constraint, find the maximum one that contains these variables
 			#TODO
-			pass
+			return 1.0
 		else:
 			all_constraint_vars = itertools.combinations(partial_vars, num_vars_per_constraint)
 
@@ -392,11 +394,14 @@ class FuzzyCSSolution:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
 				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
-				#using appropriateness as an upper bound
-				partial_appr = self.get_appropriateness(partial_vars, next_partial_assignment)
-				#better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
+				#upper bound for branch_and_bound
+				upper_bound = 1.0
+				if self.get_upper_bound_type() == "appropriateness":
+					upper_bound = self.get_appropriateness(partial_vars, next_partial_assignment)
+				elif self.get_upper_bound_type() == "partial_joint_sat":
+					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
 				
-				if partial_appr < best_joint_sat:
+				if upper_bound < best_joint_sat:
 					#prune/don't go to this branch
 					continue
 					
@@ -412,6 +417,7 @@ class FuzzyCSSolution:
 					stack = [(next, path+[next])] + stack		
 
 		return best_solution
+
 
 	#done with dfs and backtracking. gets all solutions 
 	#with joint satisfaction more than alpha
@@ -436,10 +442,14 @@ class FuzzyCSSolution:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
 				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
-				partial_appr = self.get_appropriateness(partial_vars, next_partial_assignment)
-				#better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
 				
-				if partial_appr < alpha:
+				upper_bound = 1.0
+				if self.get_upper_bound_type() == "appropriateness":
+					upper_bound = self.get_appropriateness(partial_vars, next_partial_assignment)
+				elif self.get_upper_bound_type() == "partial_joint_sat":
+					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
+
+				if upper_bound < alpha:
 					#prune/don't go to this branch
 					continue
 
