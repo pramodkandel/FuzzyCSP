@@ -122,6 +122,7 @@ class FuzzyCSSolution:
 			var_ind = self.problem.variables.index(var)
 			reduced_domains[var_ind] = (value)
 
+		#print "Reduced domains is", reduced_domains
 		#now use the magic of itertools to get all possible instantiations
 		for instance in itertools.product(*reduced_domains):
 			yield instance
@@ -171,6 +172,7 @@ class FuzzyCSSolution:
 
 	#fixed_vars is a dictionary of keys as variables and values as 
 	#corresponding fixed values of those variables
+	#ignore some values in difficulty and appr calculation
 	def get_difficulty_and_appr(self, variable, fixed_vars, ignore_values):
 		domain = self.problem.get_domain(variable)
 		fixed_variables = fixed_vars.keys()
@@ -199,46 +201,66 @@ class FuzzyCSSolution:
 		fixed_vars = {}
 		assigned_vars = []
 		backtracked_assignments = {}
+		
 		while len(fixed_vars)<len(variables):
 			best_appr_dict = None
 			least_diff = float('inf')
 			var_to_set = None
+			backtracking = False
 			for variable in variables:
 				if variable not in fixed_vars:
 					ignore_values = []
 					if variable in backtracked_assignments:
 						ignore_values = backtracked_assignments[variable]
+					#print "The variable, fixed vars, and ignore_values are", variable, fixed_vars, ignore_values
 					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars, ignore_values)
 					#print "difficulty_and_appr of variables",variable,"with fixed vars:", fixed_vars, "are:\n", difficulty, appr_dict
 					if difficulty<least_diff:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
-
-					if difficulty == 0: #will it ever happen?
+					#print "difficulty just before 0 check is", 
+					if difficulty == 0: 
 						#this means appropriateness is 0 for all values, i.e. constraints violated
 						#i.e. we need backtracking, i.e. go to previous variable, and consider values other than the one. 
 						# in the fixed_vars.
-						
+						backtracking = True
 						#pop the latest variable from assigned and 
 						#fixed_vars and do the same thing with reduced domain
 						#also need to see if the domain has been reduced to empty set
-						latest_variable = assigned_vars.pop()
+						if len(assigned_vars) >0:
+							latest_variable = assigned_vars.pop()
+						else:
+							print "No feasible solution exists"
+							return None
+							#raise FCSSolutionException("No feasible solution exists!!")
 						assigned_val = fixed_vars[latest_variable]
 
 						#add to backtracked assignments
 						if latest_variable in backtracked_assignments:
 							backtracked_values = backtracked_assignments[latest_variable]
 							backtracked_assignments[latest_variable] = backtracked_values.append(assigned_val)
+						else:
+							backtracked_assignments[latest_variable] = [assigned_val]
 						#remove from fixed_vals
 						del fixed_vars[latest_variable]
+						
 						break
+
+			if backtracking: #if backtracking, don't continue with setting up assignments
+				print "backtracking due to inconsistency of",latest_variable, assigned_val
+				continue
 			if best_appr_dict == None:
 				raise FCSSolutionException('Code should not come here. Look at heuristic_search function.')
 
 			#now instantiate the var_to_set
 			fixed_vars[var_to_set] = self.get_best_appr_var_assignment(best_appr_dict)
 			assigned_vars.append(var_to_set)
+			#print "var to set is", var_to_set
+			#print "best_appr_dict is", best_appr_dict		
+			#print "least difficulty is", least_diff
+			#print "fixed_vars are", fixed_vars
+			#print "assigned vars are", assigned_vars
 		#make sure it's a full assignment
 		assert len(fixed_vars) == len(self.problem.get_variables())
 		#make sure none of the assigned values is None
@@ -261,6 +283,8 @@ class FuzzyCSSolution:
 
 	def get_heuristic_solution(self):
 		solution = self.heuristic_search()
+		if not solution:
+			return False
 		instance = [None] * len(solution)
 
 		for i in range(len(self.problem.get_variables())):
@@ -282,6 +306,9 @@ class FuzzyCSSolution:
 		root_values = self.problem.get_domain(root_variable)		
 
 		feasible_solution = self.get_a_feasible_solution()
+		if not feasible_solution:
+			print "No feasible solution exists."
+			return None
 		best_joint_sat = self.get_joint_satisfaction_degree(feasible_solution)
 
 		best_solution = feasible_solution
@@ -299,6 +326,7 @@ class FuzzyCSSolution:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
 				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
+				#using appropriateness as an upper bound
 				partial_appr = self.get_appropriateness(partial_vars, next_partial_assignment)
 				#better_joint_sat = self.is_joint_satisfaction_better_or_equalto_alpha(partial_vars, next_partial_assignment, best_joint_sat)
 				
@@ -308,6 +336,7 @@ class FuzzyCSSolution:
 					
 				if graph[next] == []: # next vertex is the leaf
 					instance = tuple(path + [next])
+					#print "Instance is", instance
 					joint_sat = self.get_joint_satisfaction_degree(instance)
 					if joint_sat > best_joint_sat:
 						best_joint_sat = joint_sat

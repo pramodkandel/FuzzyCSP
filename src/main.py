@@ -51,15 +51,16 @@ def main_wrapper(opts, args):
                 ]
 
     heuristic_backtrack_constraints =[
-               {('S','D', None):1.0, 
+               {('S','D', None):0.5, 
                 ('S','G',None):1.0,
-                ('C','B',None):0.5},
+                ('C','B',None):0.1},
                {('S', None, 'W'):1.0,
-                ('S', None, 'L'):1.0,
-                ('C', None, 'W'):0.5,
-                ('C', None, 'L'):0.5},
+                ('C', None, 'W'):1.0,
+                ('C', None, 'L'):1.0},
                {(None, 'B', 'W'):1.0,
-                (None, 'B', 'L'):1.0 }                 
+                (None, 'B', 'L'):1.0,
+                (None, 'G', 'L'):1.0,
+                (None, 'D', 'L'):1.0}                 
                 ]
 
     problem = FuzzyCSProblem(variables,domains, constraints)
@@ -97,14 +98,25 @@ def main_wrapper(opts, args):
     print "all feasible solutions 2 are", list(all_solutions)
     print "---------------------------------"
 
-    heuristic_solution = solution2.get_heuristic_solution()
-    print "Heuristic solution is", heuristic_solution
-    print "Joint satisfaction degree is", solution2.get_joint_satisfaction_degree(heuristic_solution)
+
+    feasible_solution = solution2.get_a_feasible_solution()
+    print "a feasible solution 2 is", feasible_solution
+    print "---------------------------------"
+
+    heuristic_solution = solution2.get_heuristic_solution()  
+    if not heuristic_solution:
+        print "Feasible solutions don't exist"
+    else:
+        print "Heuristic solution is", heuristic_solution
+        print "Joint satisfaction degree is", solution2.get_joint_satisfaction_degree(heuristic_solution)
     print "---------------------------"
 
     bnb_solution = solution2.get_branch_and_bound_solution()
-    print "branch_n_bound solution is", bnb_solution
-    print "joint_sat of branch_n_bound is", solution2.get_joint_satisfaction_degree(bnb_solution)
+    if bnb_solution: #if exists
+        print "branch_n_bound solution is", bnb_solution
+        print "joint_sat of branch_n_bound is", solution2.get_joint_satisfaction_degree(bnb_solution)
+    else:
+        print "Feasible solution doesn't exist."
     print "--------------------------------"
 
 '''
