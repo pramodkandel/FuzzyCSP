@@ -7,7 +7,8 @@ from fuzzy_example_problem import FuzzyExampleProblem
 
 #####SOME PARAMETERS######
 alpha = 0.7 #used for finding alpha solutions, i.e. solutions with joint satisfaction greater than 0.7
-
+joint_sat_type = "average" #could be "average", "min", "productive"
+upper_bound_type = "appropriateness" #could be "partial_joint_sat" or "appropriateness"
 
 #Various implemented algorithms running on example problems
 def main_wrapper(opts, args):
@@ -26,8 +27,10 @@ def main_wrapper(opts, args):
                                 #5) Problems that don't 
 
 
+
+#This demonstrates all the api necessary
 def run_all_solution_algorithms(problem):
-    solution = FuzzyCSSolution(problem)
+    solution = FuzzyCSSolution(problem, joint_sat_type, upper_bound_type)
     print "---------------------------------"
     print "RUNNING ALL ALGORITHMS..."
     print "----------------------------------"

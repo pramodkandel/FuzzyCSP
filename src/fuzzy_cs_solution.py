@@ -103,6 +103,7 @@ class FuzzyCSSolution:
 			for satisfaction in indiv_satisfaction_list:
 				joint_satisfaction *= satisfaction
 		elif self.joint_constraint_type == 'average':
+			joint_satisfaction = 0.0
 			for satisfaction in indiv_satisfaction_list:
 				joint_satisfaction += satisfaction
 			joint_satisfaction = joint_satisfaction/float(len(indiv_satisfaction_list))
@@ -126,9 +127,9 @@ class FuzzyCSSolution:
 		constraint_vars = []
 		indiv_constraint_sats = []
 		#first get all combinations of these partial_vars
-		print "partial vars is", partial_vars
+		#print "partial vars is", partial_vars
 		num_vars_per_constraint = self.problem.get_num_vars_per_constraint()
-		print "num_vars_per_constraint is", num_vars_per_constraint
+		#print "num_vars_per_constraint is", num_vars_per_constraint
 		if len(partial_vars) < num_vars_per_constraint:
 			#for each constraint, find the maximum one that contains these variables
 			#TODO
