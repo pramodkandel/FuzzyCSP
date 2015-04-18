@@ -195,13 +195,25 @@ class FuzzyExampleProblem():
 	    variables = ['maincourse', 'wine', 'lunch', 'swim']
 	    domains = [('fish', 'meat'),('redwine', 'whitewine'),('12pm', '1pm'), ('2pm', '3pm')]
 	    lunch_constraints =[
-	               {('fish','whitewine', None):1.0, 
-	                ('fish','redwine',None):0.8,
-	                ('meat','white',None):0.3,
-                        ('meat', 'red', None):0.7},
-	               {(None, '12pm', '2pm'):1.0,
-	                (None, '12pm', '3pm'):1.0,
-	                (None, '1pm', '2pm'):0,
-	                (None, '1pm', '3pm'):1.0}                 
+	               {('fish','whitewine',None,None):1.0, 
+	                ('fish','redwine',None,None):0.8,
+	                ('meat','whitewine',None,None):0.3,
+                        ('meat', 'redwine',None,None):0.7},
+                        {
+                        (None, 'redwine', '12pm',None):1,
+                        (None, 'redwine', '1pm',None):1,
+                        (None, 'whitewine', '12pm',None):1,
+                        (None, 'whitewine', '1pm',None):1
+                       },
+                        {
+                        (None, 'redwine', None,'2pm'):1,
+                        (None, 'redwine', None,'3pm'):1,
+                        (None, 'whitewine', None,'2pm'):1,
+                        (None, 'whitewine', None,'3pm'):1
+                       },
+	               {(None, None,'12pm', '2pm'):1.0,
+	                (None, None,'12pm', '3pm'):1.0,
+	                (None, None,'1pm', '2pm'):0,
+	                (None, None,'1pm', '3pm'):1.0}                 
 	                ]
 	    return FuzzyCSProblem(variables,domains, lunch_constraints)
