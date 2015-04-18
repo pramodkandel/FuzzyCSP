@@ -462,9 +462,6 @@ class FuzzyCSSolution:
 			#print "vertex is", vertex
 			#print "path is", path
 			for next in graph[vertex]:
-				#check if the path with next variable has better joint_sat than current max
-				next_partial_assignment = path+[next];
-				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
 
 				if graph[next] == []: # next vertex is the leaf
 					instance = tuple(path + [next])
