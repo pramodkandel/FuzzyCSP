@@ -36,10 +36,52 @@ class FuzzyBenchmarkTest():
 		    #f.write("###"+str(time.time())+"###\n")
 		    f.write("BLANK, num_constraint_checks, num_var_assignments, runtime, sol_param\n")
 
-		#first backtracking
+		#heuristic search
+		print "Benchmarking heuristic search..."
+		start_time = time.time()
+		found_solution = solution.get_heuristic_solution()
+		runtime = time.time() - start_time
+		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
+		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
+		print "solution was", found_solution
+		if found_solution:
+			print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
+			heuristics_joint_sat_value = solution.get_joint_satisfaction_degree(found_solution)
+		print "Runtime was", runtime
+		print "num_var_assignments was", num_var_assignments
+		print "num_constraints_check was", num_constraints_check
+		#write info to file
+		f.write("heuristic_search, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
+		self.cleanup_benchmark_metrics()
+
+		#branch_and_bound
+		print "Benchmarking branch_and_bound search..."
+		start_time = time.time()
+		found_solution = solution.get_branch_and_bound_solution()
+		runtime = time.time() - start_time
+		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
+		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
+		print "solution was", found_solution
+		if found_solution:
+			print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
+			bnb_joint_sat_value = solution.get_joint_satisfaction_degree(found_solution)
+		print "Runtime was", runtime
+		print "num_var_assignments was", num_var_assignments
+		print "num_constraints_check was", num_constraints_check
+		#write info to file
+		f.write("branch_and_bound, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
+
+		self.cleanup_benchmark_metrics()
+
+
+		#backtracking
 		print "Benchmarking backtracking..."
 		start_time = time.time()
-		found_solution = solution.get_a_feasible_solution()
+
+		#found_solution = solution.get_a_feasible_solution()
+		print "alpha solution = ",min(heuristics_joint_sat_value,bnb_joint_sat_value)
+		found_solution = solution.get_an_alpha_solution(min(heuristics_joint_sat_value,bnb_joint_sat_value))
+		
 		runtime = time.time() - start_time
 		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
 		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
@@ -53,42 +95,6 @@ class FuzzyBenchmarkTest():
 		#write info to file
 		f.write("backtracking, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
 		self.cleanup_benchmark_metrics()
-
-		#then heuristic search
-		print "Benchmarking heuristic search..."
-		start_time = time.time()
-		found_solution = solution.get_heuristic_solution()
-		runtime = time.time() - start_time
-		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
-		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
-		print "solution was", found_solution
-		if found_solution:
-			print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
-		print "Runtime was", runtime
-		print "num_var_assignments was", num_var_assignments
-		print "num_constraints_check was", num_constraints_check
-		#write info to file
-		f.write("heuristic_search, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
-		self.cleanup_benchmark_metrics()
-
-		#then branch_and_bound
-		print "Benchmarking branch_and_bound search..."
-		start_time = time.time()
-		found_solution = solution.get_branch_and_bound_solution()
-		runtime = time.time() - start_time
-		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
-		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
-		print "solution was", found_solution
-		if found_solution:
-			print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
-		print "Runtime was", runtime
-		print "num_var_assignments was", num_var_assignments
-		print "num_constraints_check was", num_constraints_check
-		#write info to file
-		f.write("branch_and_bound, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
-
-		self.cleanup_benchmark_metrics()
-
 		#close the file in the end
                 if open_new_file == True:	
 		    f.close()
