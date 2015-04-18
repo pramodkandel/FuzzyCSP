@@ -195,8 +195,8 @@ class FuzzyExampleProblem():
 	    variables = ['maincourse', 'wine', 'lunch', 'swim']
 	    domains = [('fish', 'meat'),('redwine', 'whitewine'),('12pm', '1pm'), ('2pm', '3pm')]
 	    lunch_constraints =[
-	               {('fish','white_wine', None):1.0, 
-	                ('fish','red_wine',None):0.8,
+	               {('fish','whitewine', None):1.0, 
+	                ('fish','redwine',None):0.8,
 	                ('meat','white',None):0.3,
                         ('meat', 'red', None):0.7},
 	               {(None, '12pm', '2pm'):1.0,
