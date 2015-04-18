@@ -34,6 +34,11 @@ def main_wrapper(opts, args):
 
 #This demonstrates all the api necessary
 def run_all_solution_algorithms(problem):
+    #print "problem variables:", problem.get_variables()
+    #print "problem domains", problem.get_domains()
+    #print "problem constraints:"
+    for constraint in problem.get_constraints():
+        print constraint
     solution = FuzzyCSSolution(problem, joint_sat_type, upper_bound_type)
     print "---------------------------------"
     print "RUNNING ALL ALGORITHMS..."

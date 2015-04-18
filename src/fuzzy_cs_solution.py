@@ -167,11 +167,13 @@ class FuzzyCSSolution:
 			var = fixed_vars[i]
 			value = fixed_values[i]
 			var_ind = self.problem.variables.index(var)
-			reduced_domains[var_ind] = (value)
+			reduced_domains[var_ind] = [value]
 
+		#print "the reduced domain is", reduced_domains
 		#print "Reduced domains is", reduced_domains
 		#now use the magic of itertools to get all possible instantiations
 		for instance in itertools.product(*reduced_domains):
+			#print "the instance being yielded is", instance
 			yield instance
 			#instantiations.append(instance)
 		#return instantiations
@@ -226,7 +228,9 @@ class FuzzyCSSolution:
 		#print "All constraints for appropriateness are", all_constraints
 		best_joint_sat = 0
 		for instance in self.get_all_possible_instantiations(variables, values):
+			#print "current instance being checked is", instance
 			joint_sat = self.get_joint_constraint_satisfaction_degree(all_constraints, instance)
+			#print "joint sat for the instance is", joint_sat
 			if joint_sat > best_joint_sat:
 				best_joint_sat = joint_sat
 		return best_joint_sat
@@ -321,8 +325,8 @@ class FuzzyCSSolution:
 			assigned_vars.append(var_to_set)
 			#print "var to set is", var_to_set
 			#print "best_appr_dict is", best_appr_dict		
-			#print "least difficulty is", least_diff
-			#print "fixed_vars are", fixed_vars
+			#print "least difficulty is", least_diff			
+			#print "fixed_vars are", fixed_vars			
 			#print "assigned vars are", assigned_vars
 		#make sure it's a full assignment
 		assert len(fixed_vars) == len(self.problem.get_variables())
@@ -417,7 +421,9 @@ class FuzzyCSSolution:
 	#done with dfs and backtracking. gets all solutions 
 	#with joint satisfaction more than alpha
 	def get_alpha_solutions(self, alpha):
+		#print "Called alpha solution.."
 		graph = self.get_search_tree()
+		#print "Graph is", graph
 		root_variable = self.problem.get_variables()[0]
 		root_values = self.problem.get_domain(root_variable)		
 

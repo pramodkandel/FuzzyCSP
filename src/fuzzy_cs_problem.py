@@ -17,6 +17,9 @@ class FuzzyCSProblem:
 	def get_domain(self, variable):
 		return self.vars_and_domains[variable]
 
+	def get_domains(self):
+		return self.domains
+
 	def get_constraints(self):
 		return self.constraints
 
