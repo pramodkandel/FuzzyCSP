@@ -1,5 +1,4 @@
-###1429380368.81###
-BLANK, num_constraint_checks, num_var_assignments, runtime
-backtracking, 15, 2, 0.000271081924438
-heuristic_search, 109, 3, 0.000900030136108
-bnb_search, 72, 8, 0.000662088394165
+BLANK, num_constraint_checks, num_var_assignments, runtime, sol_param
+backtracking, 48, 2, 0.000303030014038, 0.95
+heuristic_search, 1434, 3, 0.0124759674072
+bnb_search, 324, 9, 0.00141382217407
