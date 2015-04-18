@@ -253,6 +253,8 @@ class FuzzyCSSolution:
 		fixed_variables = fixed_vars.keys()
 		appr_dict = {}
 		difficulty = 0
+		print "variable, fixed_vars, ignore_values", variable, fixed_vars, ignore_values
+		print "domain is", domain
 		for value in domain:
 			if value in ignore_values:
 				continue
@@ -290,12 +292,12 @@ class FuzzyCSSolution:
 					#print "The variable, fixed vars, and ignore_values are", variable, fixed_vars, ignore_values
 					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars, ignore_values)
 
-					#print "difficulty_and_appr of variables",variable,"with fixed vars:", fixed_vars, "are:\n", difficulty, appr_dict
+					print "difficulty_and_appr of variables",variable,"with fixed vars:", fixed_vars, "are:\n", difficulty, appr_dict
 					if difficulty<least_diff:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
-					#print "difficulty just before 0 check is", difficulty
+					print "difficulty just before 0 check is", difficulty
 					if difficulty == 0: 
 						#this means appropriateness is 0 for all values, i.e. constraints violated
 						#i.e. we need backtracking, i.e. go to previous variable, and consider values other than the one. 
@@ -335,11 +337,11 @@ class FuzzyCSSolution:
 
 			if self.do_benchmark:
 				FuzzyBenchmarkMetrics.num_var_assignments += 1
-			#print "var to set is", var_to_set
-			#print "best_appr_dict is", best_appr_dict		
-			#print "least difficulty is", least_diff			
-			#print "fixed_vars are", fixed_vars			
-			#print "assigned vars are", assigned_vars
+			print "var to set is", var_to_set
+			print "best_appr_dict is", best_appr_dict		
+			print "least difficulty is", least_diff			
+			print "fixed_vars are", fixed_vars			
+			print "assigned vars are", assigned_vars
 		#make sure it's a full assignment
 		assert len(fixed_vars) == len(self.problem.get_variables())
 		#make sure none of the assigned values is None

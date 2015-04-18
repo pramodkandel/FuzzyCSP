@@ -25,11 +25,14 @@ class FuzzyExampleProblem():
 		self.connectivity = connectivity
 		self.range_sat_values = range_sat_values
 
+	
+
 	#generate and return example problem given the parameters
 	def generate_example_problem(self):
 		variables, domains = self.generate_variables_and_domains()
 
 		constraints = self.generate_constraints(variables, domains)
+		return FuzzyCSProblem(variables, domains, constraints)
 
 	def generate_variables_and_domains(self):
 		lowercase_initial = ord('a')
