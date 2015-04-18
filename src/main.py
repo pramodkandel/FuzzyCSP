@@ -7,7 +7,7 @@ from fuzzy_example_problem import FuzzyExampleProblem
 
 #####SOME PARAMETERS######
 alpha = 0.7 #used for finding alpha solutions, i.e. solutions with joint satisfaction greater than 0.7
-joint_sat_type = "productive" #could be "average", "min", "productive"
+joint_sat_type = "average" #could be "average", "min", "productive"
 upper_bound_type = "appropriateness" #could be "partial_joint_sat" or "appropriateness"
 
 #Various implemented algorithms running on example problems
