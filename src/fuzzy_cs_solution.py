@@ -465,16 +465,6 @@ class FuzzyCSSolution:
 				#check if the path with next variable has better joint_sat than current max
 				next_partial_assignment = path+[next];
 				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
-				
-				upper_bound = 1.0
-				if self.get_upper_bound_type() == "appropriateness":
-					upper_bound = self.get_appropriateness(partial_vars, next_partial_assignment)
-				elif self.get_upper_bound_type() == "partial_joint_sat":
-					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
-
-				if upper_bound < alpha:
-					#prune/don't go to this branch
-					continue
 
 				if graph[next] == []: # next vertex is the leaf
 					instance = tuple(path + [next])
