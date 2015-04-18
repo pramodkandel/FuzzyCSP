@@ -1,12 +1,12 @@
 import itertools
 
 class FuzzyCSSolution:
-	def __init__(self, problem, joint_constraint_type = 'productive', upper_bound_type = "appropriateness"):
+	def __init__(self, problem, joint_constraint_type = 'productive', upper_bound_type = "appropriateness", do_benchmark=False):
 		self.problem = problem
 		self.joint_constraint_type = joint_constraint_type
 		self.search_tree = None
 		self.upper_bound_type = upper_bound_type #can be "partial_joint_sat" or "appropriateness"
-
+		self.do_benchmark = do_benchmark
 
 	def set_joint_constraint_type(self, constraint_type):
 		self.joint_constraint_type = constraint_type
@@ -21,6 +21,11 @@ class FuzzyCSSolution:
 	def set_upper_bound_type(self, upper_bound_type):
 		self.upper_bound_type = upper_bound_type
 
+	def set_do_benchmark(self,boolean):
+		self.do_benchmark = boolean
+
+	def get_do_benchmark(self):
+		return self.do_benchmark
 
 	#useful for backtracking, b&b, and similar
 	#algorithms that require exploring tree
@@ -58,7 +63,7 @@ class FuzzyCSSolution:
 		joint_satisfaction = 0.
 		indiv_satisfaction_list = []
 		for constraint in constraints:
-			indiv_satisfaction = self.get_constraint_satisfaction_degree(constraint, instantiation)
+			indiv_satisfaction = self.get_indiv_constraint_satisfaction_degree(constraint, instantiation)
 			indiv_satisfaction_list.append(indiv_satisfaction)
 
 		joint_satisfaction = self.get_joint_constraint_sat(indiv_satisfaction_list)
@@ -66,8 +71,8 @@ class FuzzyCSSolution:
 		return joint_satisfaction
 
 
-	#for the new constraint model
-	def get_constraint_satisfaction_degree(self,constraint, instantiation):
+
+	def get_indiv_constraint_satisfaction_degree(self,constraint, instantiation):
 		#TODO:check that the instantiation is of right length
 		satisfaction = 0.
 		for fuzzy_assignment in constraint.keys():
@@ -225,17 +230,7 @@ class FuzzyCSSolution:
 			if joint_sat > best_joint_sat:
 				best_joint_sat = joint_sat
 		return best_joint_sat
-
-
-	#similar implementation as get_appropriateness, but returns as soon as it finds 
-	#some joint satisfaction better than or equal to the required threshold alpha
-	def is_joint_satisfaction_better_or_equalto_alpha(self,variables, values, alpha):
-		#we can do this in loop rather than generating all instances before
-		for instance in self.get_all_possible_instantiations(variables, values):
-			joint_sat = self.get_joint_satisfaction_degree(instance)
-			if joint_sat >= alpha:
-				return True, joint_sat
-		return False		
+	
 
 	#fixed_vars is a dictionary of keys as variables and values as 
 	#corresponding fixed values of those variables
