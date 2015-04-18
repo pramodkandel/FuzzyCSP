@@ -25,6 +25,10 @@ def main_wrapper(opts, args):
     print "Running solutions for variant of temporal problem given in thought exercise #3..."
     run_all_solution_algorithms(temporal_problem)
 
+    lunch_swim_problem = example_problem.get_lunch_swim_problem()
+    print "Running solutions for Fuzzy SCSP of preference & temporal preference problem ..."
+    run_all_solution_algorithms(lunch_swim_problem)
+    
     #TODO:ADD some more problems: 1) crisp constraints, 2) Francesca's dinner problem 3) Our lunch problem 
                                 #4)infeasible(some variables don't satisfy any constraints), this is only
                                 #infeasible for the joint_sat_type of "productive" and "min"
