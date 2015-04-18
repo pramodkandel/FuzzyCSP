@@ -74,6 +74,9 @@ class FuzzyCSSolution:
 
 	def get_indiv_constraint_satisfaction_degree(self,constraint, instantiation):
 		#TODO:check that the instantiation is of right length
+		if self.do_benchmark:
+			FuzzyBenchmarkMetrics.num_constraint_checks += 1
+
 		satisfaction = 0.
 		for fuzzy_assignment in constraint.keys():
 			satisfies = True
@@ -96,7 +99,7 @@ class FuzzyCSSolution:
 		return True
 
 
-	#the fixed_constraints are specific constraints assignments from the table
+
 	def get_joint_constraint_sat(self, indiv_constraint_sats):
 		indiv_satisfaction_list = indiv_constraint_sats
 		if len(indiv_satisfaction_list) == 0:
@@ -190,6 +193,8 @@ class FuzzyCSSolution:
 					all_vars_satisfy = False
 					break
 			if all_vars_satisfy:
+				if self.do_benchmark:
+					FuzzyBenchmarkMetrics.num_constraint_checks += 1
 				reduced_constraints.append(constraint)
 		return reduced_constraints
 
@@ -199,6 +204,10 @@ class FuzzyCSSolution:
 	def get_constraints_sat_with_fixed_vars(self, variables, values):
 		#first assert that the length of variables is same as num_vars_per_constraint
 		assert len(variables) == self.problem.num_vars_per_constraint
+
+		if self.do_benchmark:
+			FuzzyBenchmarkMetrics.num_constraint_checks += 1
+
 		problem_variables = self.problem.variables
 
 		#create constraint key
@@ -323,6 +332,9 @@ class FuzzyCSSolution:
 			#now instantiate the var_to_set
 			fixed_vars[var_to_set] = self.get_best_appr_var_assignment(best_appr_dict)
 			assigned_vars.append(var_to_set)
+
+			if self.do_benchmark:
+				FuzzyBenchmarkMetrics.num_var_assignments += 1
 			#print "var to set is", var_to_set
 			#print "best_appr_dict is", best_appr_dict		
 			#print "least difficulty is", least_diff			
@@ -361,6 +373,7 @@ class FuzzyCSSolution:
 		#make sure there is no None assigned for any variable
 		assert None not in instance
 		instance = tuple(instance)
+
 		return instance
 
 
@@ -387,6 +400,8 @@ class FuzzyCSSolution:
 		while stack:
 			#print "bnb stack is", stack
 			(vertex, path) = stack.pop(0)
+			if self.do_benchmark:
+				FuzzyBenchmarkMetrics.num_var_assignments += 1
 			#print "bnb vertex is", vertex
 			#print "bnb path is", path
 			for next in graph[vertex]:
@@ -437,6 +452,8 @@ class FuzzyCSSolution:
 		while stack:
 			#print "stack is", stack
 			(vertex, path) = stack.pop(0)
+			if self.do_benchmark:
+				FuzzyBenchmarkMetrics.num_var_assignments += 1
 			#print "vertex is", vertex
 			#print "path is", path
 			for next in graph[vertex]:
@@ -475,6 +492,11 @@ class FuzzyCSSolution:
 			return solution
 	#def get_m_best_solutions(self):
 
+#have to put here because putting inside fuzzy_benchmark_test caused circular dependency
+#during import
+class FuzzyBenchmarkMetrics():
+	num_constraint_checks = 0
+	num_var_assignments = 0
 
 class FCSSolutionException(Exception):
     def __init__(self, msg):
