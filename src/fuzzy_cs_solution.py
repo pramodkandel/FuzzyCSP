@@ -497,6 +497,10 @@ class FuzzyCSSolution:
 			return solution
 	#def get_m_best_solutions(self):
 
+	def get_an_alpha_solution(self,alpha):
+		for solution in self.get_alpha_solutions(alpha):
+			return solution
+
 #have to put here because putting inside fuzzy_benchmark_test caused circular dependency
 #during import
 class FuzzyBenchmarkMetrics():
