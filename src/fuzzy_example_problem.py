@@ -10,9 +10,7 @@ class FuzzyExampleProblem():
 	domain_size_per_variable = 2
 	num_vars_per_constraint = 2
 	tightness = 0.25
-
 	connectivity = .75 #.25,.5,.75
-
 	range_sat_values = [0.5, 1.0]
 
 	def __init__(self, num_variables=num_variables, 
