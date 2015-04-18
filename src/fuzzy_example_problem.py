@@ -152,3 +152,41 @@ class FuzzyExampleProblem():
 	                (None, 'D', 'L'):1.0}                 
 	                ]
 	    return FuzzyCSProblem(variables,domains, heuristic_backtrack_constraints)
+
+
+	def get_temporal_constraint_problem(self):
+	    variables = ['a', 'b', 'c']
+	    domains = [('W', 'M', 'H'),('W', 'M', 'H'),('W', 'M', 'H')]
+	    temporal_constraints =[
+	               {('W','W', None):1, 
+	                ('W','M',None):0.7,
+	                ('W','H',None):0.8,
+	                ('H','W', None):0.5, 
+	                ('H','M',None):0.4,
+	                ('H','H',None):0.4,
+	                ('M','W', None):0.4, 
+	                ('M','M',None):0.4,
+	                ('M','H',None):0.1
+			},
+	               {('W', None,'W'):1.0,
+	                ('W', None,'M'):1.0,
+	                ('W', None,'H'):1.0,
+			('H',None,'W'):0.5, 
+	                ('H',None,'M',):0.4,
+	                ('H',None,'H',):0.4,
+	                ('M',None,'W', ):0.4, 
+	                ('M',None,'M'):0.4,
+	                ('M',None,'H'):0.1
+		       },
+	               {(None, 'W', 'W'):0.1,
+	                (None, 'W', 'M'):0.8,
+	                (None, 'W', 'H'):0.5,
+	                (None, 'M', 'W'):0.4,
+	                (None, 'M', 'M'):0.3,
+	                (None, 'M', 'H'):0.2,
+	                (None, 'H', 'W'):0.3,
+	                (None, 'H', 'M'):0.2,
+	                (None, 'H', 'H'):0.5
+			}                 
+	                ]
+	    return FuzzyCSProblem(variables,domains, temporal_constraints)

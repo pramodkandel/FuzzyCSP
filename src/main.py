@@ -20,6 +20,10 @@ def main_wrapper(opts, args):
     heuristic_backtrack_problem = example_problem.get_heuristic_backtracking_problem()
     print "Running solutions for variant of robot dressing problem in which heuristic solution needs to backtrack..."
     run_all_solution_algorithms(heuristic_backtrack_problem)
+    
+    temporal_problem = example_problem.get_temporal_constraint_problem()
+    print "Running solutions for variant of temporal problem given in thought exercise #3..."
+    run_all_solution_algorithms(temporal_problem)
 
     #TODO:ADD some more problems: 1) crisp constraints, 2) Francesca's dinner problem 3) Our lunch problem 
                                 #4)infeasible(some variables don't satisfy any constraints), this is only
