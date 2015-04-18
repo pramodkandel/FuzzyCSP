@@ -19,7 +19,7 @@ class FuzzyBenchmarkTest():
 
 
 	#benchmarking a problem with several solutions
-	def benchmark_problem(self, problem):
+	def benchmark_problem(self, problem, f=None, sol_param=None, open_new_file=True):
 		solution = FuzzyCSSolution(problem, self.joint_sat_type, self.upper_bound_type)
 		#We benchmark for finding a feasible solution with backtracking, finding best solution with
 		#branch and bound, and finding a good solution with heuristic search
@@ -30,11 +30,11 @@ class FuzzyBenchmarkTest():
 			file_to_write = "benchmark_problem.txt"
 		else:
 			file_to_write = self.file_to_write
-		
-		f = open(file_to_write, 'w+')
-
-		f.write("###"+str(time.time())+"###\n")
-		f.write("BLANK, num_constraint_checks, num_var_assignments, runtime\n")
+	
+                if open_new_file == True:	
+		    f = open(file_to_write, 'w+')
+		    #f.write("###"+str(time.time())+"###\n")
+		    f.write("BLANK, num_constraint_checks, num_var_assignments, runtime, sol_param\n")
 
 		#first backtracking
 		print "Benchmarking backtracking..."
@@ -51,7 +51,7 @@ class FuzzyBenchmarkTest():
 		print "num_constraints_check was", num_constraints_check
 
 		#write info to file
-		f.write("backtracking, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+"\n")
+		f.write("backtracking, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
 		self.cleanup_benchmark_metrics()
 
 		#then heuristic search
@@ -68,7 +68,7 @@ class FuzzyBenchmarkTest():
 		print "num_var_assignments was", num_var_assignments
 		print "num_constraints_check was", num_constraints_check
 		#write info to file
-		f.write("heuristic_search, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+"\n")
+		f.write("heuristic_search, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
 		self.cleanup_benchmark_metrics()
 
 		#then branch_and_bound
@@ -85,11 +85,13 @@ class FuzzyBenchmarkTest():
 		print "num_var_assignments was", num_var_assignments
 		print "num_constraints_check was", num_constraints_check
 		#write info to file
-		f.write("bnb_search, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+"\n")
+		f.write("branch_and_bound, "+str(num_constraints_check)+", "+str(num_var_assignments)+", "+str(runtime)+", "+str(sol_param)+"\n")
+
 		self.cleanup_benchmark_metrics()
 
 		#close the file in the end
-		f.close()
+                if open_new_file == True:	
+		    f.close()
 
 	def cleanup_benchmark_metrics(self):
 		FuzzyBenchmarkMetrics.num_constraint_checks = 0
@@ -117,5 +119,16 @@ class FuzzyBenchmarkTest():
 
 if __name__ == '__main__':
     test = FuzzyBenchmarkTest()
-    test.benchmark_robot_dressing()
-   
+
+    #test.benchmark_robot_dressing()
+
+    f = open("BM_Tightness.txt", 'w+')
+    #f.write("###"+str(time.time())+"###\n")
+    f.write("BLANK, num_constraint_checks, num_var_assignments, runtime, sol_param\n")
+
+    for i in [float(j)/100 for j in range(0,100,5)]:
+       print "Tightness = ", i
+       sample_problem = FuzzyExampleProblem(3,6,2,i).generate_example_problem()
+       test.benchmark_problem(sample_problem,f,i,False)
+    
+    f.close() 
