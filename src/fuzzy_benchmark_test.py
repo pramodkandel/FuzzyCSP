@@ -131,14 +131,6 @@ if __name__ == '__main__':
     f = open("BM_Tightness.txt", 'w+')
     #f.write("###"+str(time.time())+"###\n")
     f.write("BLANK, num_constraint_checks, num_var_assignments, runtime, sol_param\n")
-    
-    #order of arguments passed	
-    #num_variables
-    #domain_size_per_variable 
-    #num_vars_per_constraint 
-    #tightness 
-    #connectivity
-    #range_sat_values
 
     for i in [float(j)/100 for j in range(0,100,5)]:
        print "Tightness = ", i
