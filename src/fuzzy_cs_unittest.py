@@ -4,7 +4,7 @@ import time
 from fuzzy_cs_problem import FuzzyCSProblem
 from fuzzy_cs_solution import FuzzyCSSolution
 
-
+from fuzzy_example_problem import FuzzyExampleProblem
     
 '''
     problem2 = get_heuristic_backtracking_problem
@@ -90,7 +90,13 @@ class SomeTest(unittest.TestCase):
         print "%s: %.3f" % (self.id(), t)
 
     def testOne(self):
-        time.sleep(1)
+        example_problem = FuzzyExampleProblem()
+        variables, domains = example_problem.generate_variables_and_domains()
+        constraints = example_problem.generate_constraints(variables, domains)
+        print "Variables: ",variables
+        print "domains:",domains
+        for constraint in constraints:
+            print "constraint is:", constraint
         self.assertEquals(int('42'), 42)
 
     def testTwo(self):

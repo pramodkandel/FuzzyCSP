@@ -193,7 +193,6 @@ class FuzzyCSSolution:
 		#first assert that the length of variables is same as num_vars_per_constraint
 		assert len(variables) == self.problem.num_vars_per_constraint
 		problem_variables = self.problem.variables
-		problem_var_indices = [problem_variables.index(var) for var in problem_variables]
 
 		#create constraint key
 		constraint_key_list = [None]*len(problem_variables)
