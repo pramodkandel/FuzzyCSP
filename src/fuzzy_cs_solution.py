@@ -206,10 +206,6 @@ class FuzzyCSSolution:
 	def get_constraints_sat_with_fixed_vars(self, variables, values):
 		#first assert that the length of variables is same as num_vars_per_constraint
 		assert len(variables) == self.problem.num_vars_per_constraint
-
-		if self.do_benchmark:
-			FuzzyBenchmarkMetrics.num_constraint_checks += 1
-
 		problem_variables = self.problem.variables
 
 		#create constraint key
@@ -221,9 +217,13 @@ class FuzzyCSSolution:
 			constraint_key_list[problem_var_ind] = value
 		constraint_key = tuple(constraint_key_list)
 
+
+		constraints = self.get_constraints_with_variables(variables)
+		if len(constraints) == 0:
+			return 1
 		#now find a specific constraint key and return the satisfaction
 		return_sat = 0
-		for constraint in self.problem.constraints:
+		for constraint in constraints:
 			if constraint_key in constraint:
 				return_sat = constraint[constraint_key]
 				break
@@ -237,6 +237,9 @@ class FuzzyCSSolution:
 			all_constraints = self.get_constraints_with_variables(variables)
 		#print "All instances for appropriateness are", all_instances
 		#print "All constraints for appropriateness are", all_constraints
+		if len(all_constraints) == 0: #these variables are unconstrained
+			return 1
+
 		best_joint_sat = 0
 		for instance in self.get_all_possible_instantiations(variables, values):
 			#print "current instance being checked is", instance
@@ -296,38 +299,40 @@ class FuzzyCSSolution:
 					difficulty, appr_dict = self.get_difficulty_and_appr(variable, fixed_vars, ignore_values)
 
 					#print "difficulty_and_appr of variables",variable,"with fixed vars:", fixed_vars, "are:\n", difficulty, appr_dict
-					if difficulty<least_diff:
+					if appr_dict and difficulty>0 and difficulty<least_diff:
 						least_diff = difficulty
 						best_appr_dict = appr_dict
 						var_to_set = variable
-					#print "difficulty just before 0 check is", difficulty
-					if difficulty == 0: 
-						#this means appropriateness is 0 for all values, i.e. constraints violated
-						#i.e. we need backtracking, i.e. go to previous variable, and consider values other than the one. 
-						# in the fixed_vars.
-						backtracking = True
-						#pop the latest variable from assigned and 
-						#fixed_vars and do the same thing with reduced domain
-						#also need to see if the domain has been reduced to empty set
-						if len(assigned_vars) >0:
-							latest_variable = assigned_vars.pop()
-						else:
-							print "No feasible solution exists"
-							return None
-							#raise FCSSolutionException("No feasible solution exists!!")
-						assigned_val = fixed_vars[latest_variable]
+			#if none of the next variable assignment is consistent with the current one
+			#difficulty = 0 for all, so backtrack
+			if least_diff == float('inf') or least_diff == 0: 
+				#this means appropriateness is 0 for all values, i.e. constraints violated
+				#i.e. we need backtracking, i.e. go to previous variable, and consider values other than the one. 
+				# in the fixed_vars.
+				backtracking = True
+				#pop the latest variable from assigned and 
+				#fixed_vars and do the same thing with reduced domain
+				#also need to see if the domain has been reduced to empty set
+				if len(assigned_vars) >0:
+					latest_variable = assigned_vars.pop()
+				else:
+					print "No feasible solution exists"
+					return None
+					#raise FCSSolutionException("No feasible solution exists!!")
+				assigned_val = fixed_vars[latest_variable]
 
-						#add to backtracked assignments
-						if latest_variable in backtracked_assignments:
-							backtracked_assignments[latest_variable].append(assigned_val) 
-						else:
-							backtracked_assignments[latest_variable] = [assigned_val]
-						del fixed_vars[latest_variable]
-						
-						break
+				#add to backtracked assignments
+				if latest_variable in backtracked_assignments:
+					backtracked_assignments[latest_variable].append(assigned_val) 
+				else:
+					backtracked_assignments[latest_variable] = [assigned_val]
+				del fixed_vars[latest_variable]
+				
+				#break
 
 			if backtracking: #if backtracking, don't continue with setting up assignments
 				print "backtracking due to inconsistency of",latest_variable, assigned_val
+				#print "fixed vars are:", fixed_vars
 				continue
 			if best_appr_dict == None:
 				raise FCSSolutionException('Code should not come here. Look at heuristic_search function.')
@@ -384,13 +389,13 @@ class FuzzyCSSolution:
 
 
 	#b&b based on dfs and backtracking. Uses appropriateness value 
-	#as the upper bound while bounding
+	#as the upper bound while bounding. returns the best solution
 	def get_branch_and_bound_solution(self):
 		graph = self.get_search_tree()
 		root_variable = self.problem.get_variables()[0]
 		root_values = self.problem.get_domain(root_variable)		
 
-		feasible_solution = self.get_a_feasible_solution()
+		feasible_solution = self.get_a_feasible_solution_backtracking()
 		if not feasible_solution:
 			print "No feasible solution exists."
 			return None
@@ -438,9 +443,55 @@ class FuzzyCSSolution:
 		return best_solution
 
 
+
+	#gives all alpha solutions using branch and bound pruning
+	def get_alpha_solutions_branch_n_bound(self, alpha):
+		graph = self.get_search_tree()
+		root_variable = self.problem.get_variables()[0]
+		root_values = self.problem.get_domain(root_variable)		
+
+		lower_bound = alpha
+		#create initial stack with the root variables
+		stack = []
+		for root_val in root_values:
+			stack.append((root_val, [root_val]))
+
+		while stack:
+			#print "bnb stack is", stack
+			(vertex, path) = stack.pop(0)
+			if self.do_benchmark:
+				FuzzyBenchmarkMetrics.num_var_assignments += 1
+			#print "bnb vertex is", vertex
+			#print "bnb path is", path
+			for next in graph[vertex]:
+				#check if the path with next variable has better joint_sat than current max
+				next_partial_assignment = path+[next];
+				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
+				#upper bound for branch_and_bound
+				upper_bound = 1.0
+				if self.get_upper_bound_type() == "appropriateness":
+					upper_bound = self.get_appropriateness(partial_vars, next_partial_assignment)
+				elif self.get_upper_bound_type() == "partial_joint_sat":
+					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
+				
+				if upper_bound < lower_bound:
+					#prune/don't go to this branch
+					continue
+					
+				if graph[next] == []: # next vertex is the leaf
+					instance = tuple(path + [next])
+					#print "Instance is", instance
+					joint_sat = self.get_joint_satisfaction_degree(instance)
+					if joint_sat >= alpha:
+						yield tuple(path + [next])
+					yield instance
+				else:
+					stack = [(next, path+[next])] + stack		
+		
+
 	#done with dfs and backtracking. gets all solutions 
 	#with joint satisfaction more than alpha
-	def get_alpha_solutions(self, alpha):
+	def get_alpha_solutions_backtracking(self, alpha):
 		#print "Called alpha solution.."
 		graph = self.get_search_tree()
 		#print "Graph is", graph
@@ -472,20 +523,27 @@ class FuzzyCSSolution:
 					stack = [(next, path+[next])] + stack
 
 
-	def get_all_feasible_solutions(self):
+	#uses backtracking to find all feasible solutions
+	def get_all_feasible_solutions_backtracking(self):
 		import sys
 		#epsilon is the "smallest constant" greater than zero
-		return self.get_alpha_solutions(sys.float_info.epsilon)
+		return self.get_alpha_solutions_backtracking(sys.float_info.epsilon)
 
-
-	def get_a_feasible_solution(self):
+	#uses backtracking to find a feasible solution
+	def get_a_feasible_solution_backtracking(self):
 		import sys
-		for solution in self.get_alpha_solutions(sys.float_info.epsilon):
+		for solution in self.get_alpha_solutions_backtracking(sys.float_info.epsilon):
 			return solution
 	#def get_m_best_solutions(self):
 
-	def get_an_alpha_solution(self,alpha):
-		for solution in self.get_alpha_solutions(alpha):
+	#backtracking to find alpha solution by default
+	def get_an_alpha_solution_backtracking(self,alpha):
+		for solution in self.get_alpha_solutions_backtracking(alpha):
+			return solution
+
+	#an alpha solution with branch and bound
+	def get_an_alpha_solution_branch_n_bound(self, alpha):
+		for solution in self.get_alpha_solutions_branch_n_bound(alpha):
 			return solution
 
 #have to put here because putting inside fuzzy_benchmark_test caused circular dependency

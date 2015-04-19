@@ -80,7 +80,7 @@ class FuzzyBenchmarkTest():
 
 		#found_solution = solution.get_a_feasible_solution()
 		print "alpha solution = ",min(heuristics_joint_sat_value,bnb_joint_sat_value)
-		found_solution = solution.get_an_alpha_solution(min(heuristics_joint_sat_value,bnb_joint_sat_value))
+		found_solution = solution.get_an_alpha_solution_backtracking(min(heuristics_joint_sat_value,bnb_joint_sat_value))
 		
 		runtime = time.time() - start_time
 		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments

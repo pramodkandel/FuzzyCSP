@@ -7,7 +7,7 @@ from fuzzy_example_problem import FuzzyExampleProblem
 
 #####SOME PARAMETERS######
 alpha = 0.7 #used for finding alpha solutions, i.e. solutions with joint satisfaction greater than 0.7
-joint_sat_type = "average" #could be "average", "min", "productive"
+joint_sat_type = "productive" #could be "average", "min", "productive"
 upper_bound_type = "appropriateness" #could be "partial_joint_sat" or "appropriateness"
 
 #Various implemented algorithms running on example problems
@@ -49,7 +49,7 @@ def run_all_solution_algorithms(problem):
     print "----------------------------------"
 
     print "Finding a feasible solution with backtracking..."
-    feasible_solution = solution.get_a_feasible_solution()
+    feasible_solution = solution.get_a_feasible_solution_backtracking()
     if feasible_solution:
         print "a feasible solution is", feasible_solution
     else:
@@ -57,12 +57,12 @@ def run_all_solution_algorithms(problem):
     print "------------------------------"  
 
     print "Finding all feasible solutions with backtracking..."
-    all_solutions = solution.get_all_feasible_solutions()
+    all_solutions = solution.get_all_feasible_solutions_backtracking()
     print "all feasible solutions are", list(all_solutions)
     print "---------------------------------"
 
     print "Finding alpha solutions with alpha-backtracking..."
-    alpha_solutions = solution.get_alpha_solutions(alpha)
+    alpha_solutions = solution.get_alpha_solutions_backtracking(alpha)
     print "all alpha solutions with alpha:",alpha, "are", list(alpha_solutions)
     print "---------------------------"
 
