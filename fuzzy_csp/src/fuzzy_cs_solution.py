@@ -545,6 +545,21 @@ class FuzzyCSSolution:
 		for solution in self.get_alpha_solutions_branch_n_bound(alpha):
 			return solution
 
+	#a function for returning m-best solutions
+	def get_m_best_solutions(self, m):
+		m_soln_dict = {} #will stop growing when it reaches m
+
+		import sys
+		for solution in self.get_alpha_solutions_backtracking(sys.float_info.epsilon):
+			sat_degree = self.get_joint_satisfaction_degree(solution)
+			m_soln_dict[solution] = sat_degree
+		degree_sorted_solns = sorted(m_soln_dict, key=lambda k: m_soln_dict[k])
+		if m>=len(degree_sorted_solns):
+			return degree_sorted_solns[(len(degree_sorted_solns)-m):]
+		else:
+			return degree_sorted_solns
+
+
 #have to put here because putting inside fuzzy_benchmark_test caused circular dependency
 #during import
 class FuzzyBenchmarkMetrics():

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<script>
+var round=0;
+var preferences = [];
+
+function stringifyPreferences (preferences,i,j)
+{
+	var str; 
+	if (j == "0") {
+		str = preferences[i].combined.main + ", " + preferences[i].combined.side + " and " + preferences[i].combined.drink;	
+	} else if (j == "1") {
+		str = preferences[i].desirability.main + ", " + preferences[i].desirability.side + " and " + preferences[i].desirability.drink;	
+	} else if (j == "2") {
+		str = preferences[i].availability.main + ", " + preferences[i].availability.side + " and " + preferences[i].availability.drink;	
+	}
+	return str;
+}
+
+function getNextPreference(attempt) {
+	$.ajax({
+		type: "GET",
+		url: "http://localhost:5000/sendNextPreference",
+		data: { attempt: attempt},
+		dataType: 'text'
+	}).done(function ( response ) {
+			//alert(response);
+			preferences.push(JSON.parse(response));
+			
+			if (attempt == 1) {
+				document.getElementById("alternate_choice_explain").style.visibility='visible';
+				
+				document.getElementById("alternate_choice_explain").innerHTML= "<br>" + " Hmmm.. let me see. Your most favourite breakfast " + stringifyPreferences(preferences,0,1) + " was low on stock, the best I could do was " + stringifyPreferences(preferences,0,0) + "But since you didnt like it, how about " + stringifyPreferences(preferences,1,0) + "?" + "<br>What would you like to go along?";
+				
+				 document.getElementById("alt_choice_1_yes").style.visibility='visible';
+				 document.getElementById("alt_choice_1_no").style.visibility='visible';
+			} else if (attempt == 2) {
+				document.getElementById("alt_choice_2_explain").style.visibility='visible';
+				document.getElementById("alt_choice_2").innerHTML=stringifyPreferences(preferences,2,0) + "?";
+				document.getElementById("alt_choice_2_yes").style.visibility='visible';
+				document.getElementById("alt_choice_2_no").style.visibility='visible';
+			} else if (attempt == 3) {
+				document.getElementById("alt_choice_3_explain").style.visibility='visible';
+				document.getElementById("alt_choice_3").innerHTML=stringifyPreferences(preferences,3,0) + "!";				
+			}
+	});
+}
+
+function finalizeMainPreference () {
+	alert ("You are all set");
+}
+
+function addPreference (options) {
+	preferences.push(JSON.parse(options));
+}
+
+function init () {
+	
+	// Get the best preferences based on desirability, availability and combined
+	$.ajax({
+		type: "GET",
+		url: "http://localhost:5000/"
+	}).done(function ( response ) {
+			
+			preferences.push(JSON.parse(response));
+			//console.log(JSON.stringify(preferences));
+			document.getElementById("preference_initial").innerHTML = preferences[0].combined.main + ", " + preferences[0].combined.side + " and " + preferences[0].combined.drink;
+	});	
+}
+
+window.onload =init;
+
+</script>
+<head>
+    <script src="javascript/jquery-1.11.2.min.js"></script>
+	<title>Captain Fridge</title>
+</head>
+<body>
+<div>
+	Good Morning! How would you like <p id="preference_initial"></p> to have for breakfast today? <input type="button" value="Sure!" onclick="finalizeMainPreference()"><input type="button" value="Not so sure :(" onclick="getNextPreference(1)">
+	
+	<div id="alternate_choice_explain" style="visibility: hidden"></div>
+	<input type="button" id="alt_choice_1_yes" value="Sure!" onclick="finalizeMainPreference()" style="visibility: hidden"><input type="button" id="alt_choice_1_no" value="Not so sure :(" onclick="getNextPreference(2)" style="visibility: hidden">		
+	
+	<div id="alt_choice_2_explain" style="visibility: hidden"><br>You are testing my precarious algorithms at this point and also my shaky processing power! Ha, I am just being modest. How about <p id="alt_choice_2"></p></div>
+	<input type="button" id="alt_choice_2_yes" value="Sure!" onclick="finalizeMainPreference()" style="visibility: hidden"><input type="button" id="alt_choice_2_no" value="Not so sure :(" onclick="getNextPreference(3)" style="visibility: hidden">
+
+	<div id="alt_choice_3_explain" style="visibility: hidden"><br>This is the last choice I can give you at this point! <p id="alt_choice_3"></p></div>
+
+</div>
+</body>
+</html>

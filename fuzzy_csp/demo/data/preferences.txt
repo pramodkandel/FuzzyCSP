@@ -1,0 +1,3 @@
+main | complement | drinks | preference
+     | bread      | milk   |  0.5
+eggs | bread      |        |  0.4

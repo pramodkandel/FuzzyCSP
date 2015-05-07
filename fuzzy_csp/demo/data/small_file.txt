@@ -1,0 +1,8 @@
+main 		| complement 	| drinks
+
+eggs 		| bread      	| milk
+bread		| jam           | juice
+oatmeal 	| apple         | milk
+yogurt		| honey         | juice
+grapefruit      | peanut butter | smoothie
+yogurt		| blueberries   | juice

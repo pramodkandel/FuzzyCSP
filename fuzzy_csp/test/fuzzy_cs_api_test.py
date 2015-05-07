@@ -11,7 +11,7 @@ alpha = 0.7 #used for finding alpha solutions, i.e. solutions with joint satisfa
 joint_sat_type = "productive" #could be "average", "min", "productive"
 upper_bound_type = "appropriateness" #could be "partial_joint_sat" or "appropriateness"
 #not inheriting unittest because of various limitations
-
+m = 5 #for m-best solutions
 
 #demonstration of how to instantiate a fuzzy problem
 def get_robot_dressing_problem():
@@ -69,6 +69,11 @@ def run_all_solution_algorithms(problem):
     print "Finding alpha solutions with branch and bound..."
     alpha_bnb_solutions = solution.get_alpha_solutions_branch_n_bound(alpha)
     print "all alpha solutions with alpha:",alpha, "are", list(alpha_bnb_solutions)
+    print "---------------------------"
+
+    print "Finding m-best solutions with backtracking..."
+    mbest_solutions = solution.get_m_best_solutions(m)
+    print "m best solutions with m:",m, "are", mbest_solutions
     print "---------------------------"
 
     print "Finding a solution with heuristic approach..."
