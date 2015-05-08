@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="javascript/UI_engine.js">
+</script>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Captain Fridge</title>
+    <script src="javascript/jquery-1.11.2.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="javascript/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap core CSS -->
+    <link href="javascript/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="javascript/bootstrap-3.3.4-dist/css/cover.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+<body>
+<div class="jumbotron">
+<h1 style="color: black">Hello, human!</h1>
+<img id="robot" src="images/forbidden-fruit.gif">
+</div>
+	<!--h1 class="cover-heading">Hello, human!</h1 -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="javascript/bootstrap-3.3.4-dist/js/bootstrap.min.js"></script>
+<div>
+<blockquote>
+	Good Morning! How would you like <p id="preference_initial"></p> to have for breakfast today? <br><br><input type="button" value="Sure!" onclick="finalizeMainPreference()" style="color: black">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Not so sure :(" onclick="getNextPreference(1)" style="color: black">
+	
+	<div id="alternate_choice_explain" style="visibility: hidden"></div>
+	<br><input type="button" id="alt_choice_1_yes" value="Sure!" onclick="finalizeMainPreference()" style="visibility: hidden ; color: black"> &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="alt_choice_1_no" value="Not so sure :(" onclick="getNextPreference(2)" style="visibility: hidden; color: black">		
+	
+	<div id="alt_choice_2_explain" style="visibility: hidden"><br>You are testing my precarious algorithms at this point and also my shaky processing power! Ha, I am just being modest. How about <p id="alt_choice_2"></p></div>
+	<input type="button" id="alt_choice_2_yes" value="Sure!" onclick="finalizeMainPreference()" style="visibility: hidden; color: black">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="alt_choice_2_no" value="Not so sure :(" onclick="getNextPreference(3)" style="visibility: hidden; color:black" >
+
+	<div id="alt_choice_3_explain" style="visibility: hidden"><br>This is the last choice I can give you at this point! <p id="alt_choice_3"></p></div>
+</blockquote>
+</div>
+</body>
+</html>
