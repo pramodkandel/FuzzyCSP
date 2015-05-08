@@ -6,7 +6,8 @@ import time
 class FuzzyBenchmarkTest():
 	alpha = 0.7
 	joint_sat_type = "productive"
-	upper_bound_type = "appropriateness"
+	#upper_bound_type = "appropriateness"
+	upper_bound_type = "partial_joint_sat"
 
 	file_to_write = None
 
@@ -17,6 +18,8 @@ class FuzzyBenchmarkTest():
 		self.upper_bound_type = upper_bound_type
 		self.file_to_write = file_to_write
 
+	def set_upper_bound_type(self, upper_bound_type):
+		self.upper_bound_type = upper_bound_type	
 
 	#benchmarking a problem with several solutions
 	def benchmark_problem(self, problem, f=None, sol_param=None, open_new_file=True):
@@ -57,14 +60,17 @@ class FuzzyBenchmarkTest():
 		#branch_and_bound
 		print "Benchmarking branch_and_bound search..."
 		start_time = time.time()
-		found_solution = solution.get_branch_and_bound_solution()
-		runtime = time.time() - start_time
+	
+        	#found_solution = solution.get_branch_and_bound_solution()
+		found_solution = solution.get_an_alpha_solution_branch_n_bound(heuristics_joint_sat_value)
+	
+        	runtime = time.time() - start_time
 		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
 		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
 		print "solution was", found_solution
-		if found_solution:
-			print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
-			bnb_joint_sat_value = solution.get_joint_satisfaction_degree(found_solution)
+		#if found_solution:
+			#print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
+			#bnb_joint_sat_value = solution.get_joint_satisfaction_degree(found_solution)
 		print "Runtime was", runtime
 		print "num_var_assignments was", num_var_assignments
 		print "num_constraints_check was", num_constraints_check
@@ -79,15 +85,16 @@ class FuzzyBenchmarkTest():
 		start_time = time.time()
 
 		#found_solution = solution.get_a_feasible_solution()
-		print "alpha solution = ",min(heuristics_joint_sat_value,bnb_joint_sat_value)
-		found_solution = solution.get_an_alpha_solution_backtracking(min(heuristics_joint_sat_value,bnb_joint_sat_value))
+		#print "alpha solution = ",min(heuristics_joint_sat_value,bnb_joint_sat_value)
+		#found_solution = solution.get_an_alpha_solution_backtracking(min(heuristics_joint_sat_value,bnb_joint_sat_value))
+		found_solution = solution.get_an_alpha_solution_backtracking(heuristics_joint_sat_value)
 		
 		runtime = time.time() - start_time
 		num_var_assignments = FuzzyBenchmarkMetrics.num_var_assignments
 		num_constraints_check = FuzzyBenchmarkMetrics.num_constraint_checks
 		print "solution was", found_solution
-		if found_solution:
-			print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
+		#if found_solution:
+			#print "Joint satisfaction was", solution.get_joint_satisfaction_degree(found_solution)
 		print "Runtime was", runtime
 		print "num_var_assignments was", num_var_assignments
 		print "num_constraints_check was", num_constraints_check
@@ -125,10 +132,10 @@ class FuzzyBenchmarkTest():
 
 if __name__ == '__main__':
     test = FuzzyBenchmarkTest()
-
+    test.set_upper_bound_type("partial_joint_sat")
     #test.benchmark_robot_dressing()
 
-    f = open("BM_Tightness.txt", 'w+')
+    f = open("BM_ProblemTightness.txt", 'w+')
     #f.write("###"+str(time.time())+"###\n")
     f.write("BLANK, num_constraint_checks, num_var_assignments, runtime, sol_param\n")
     
@@ -142,7 +149,18 @@ if __name__ == '__main__':
 
     for i in [float(j)/100 for j in range(0,100,5)]:
        print "Tightness = ", i
-       sample_problem = FuzzyExampleProblem(3,6,2,i).generate_example_problem()
+       sample_problem = FuzzyExampleProblem(5,6,2,i).generate_example_problem()
        test.benchmark_problem(sample_problem,f,i,False)
+
+    #for i in [float(j)/100 for j in range(0,120,20)]:
+       #print "Connectivity= ", i
+       #sample_problem = FuzzyExampleProblem(5,6,2,0.25,i).generate_example_problem()
+       #test.benchmark_problem(sample_problem,f,i,False)
+
+    #for i in range(2,8):
+       #print "Problem Size= ", 5^i
+       #sample_problem = FuzzyExampleProblem(i,6,2,0.25,0.75).generate_example_problem()
+       #test.benchmark_problem(sample_problem,f,i,False)
+    
     
     f.close() 
