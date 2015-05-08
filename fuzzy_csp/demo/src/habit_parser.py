@@ -3,7 +3,7 @@ class HabitParser:
     domains = [ [], [], []]
     
     breakfast_file_toList = [] #reads breakfast file as a list
-    length_breakfast_file_toList = 0
+    
     
     time_to_last_dict = {}#stores lasting times/servings for each item
 
@@ -25,7 +25,7 @@ class HabitParser:
                 self.breakfast_file_toList.append(hello)
         f.close()
         
-        self.length_breakfast_file_toList = len(self.breakfast_file_toList)
+       
         
         #populate domains
         for i in self.breakfast_file_toList:
@@ -46,19 +46,21 @@ class HabitParser:
         #populate time_to_last_dict
         with open(self.time_to_last, 'r') as f:
             lines = f.read().splitlines()
-            for i in lines[1:]:
+            for i in lines[2:]:
                 hello = i.split(':')
                 hello = [k.strip(' \t\n') for k in hello]
-                self.time_to_last_dict[hello[0]] = int(hello[1])
+                if hello != ['']:
+                    self.time_to_last_dict[hello[0]] = int(hello[1])
         f.close()
         
         #populate preferences_dict
         with open(self.master_preferences, 'r') as f:
               lines = f.read().splitlines()
-              for i in lines[1:]:
+              for i in lines[2:]:
                 hello = i.split('|')
                 hello = [k.strip(' t\n') for k in hello]
-                self.preferences_dict[(hello[0],hello[1], hello[2])] = float(hello[3])
+                if hello != ['']:
+                    self.preferences_dict[(hello[0],hello[1], hello[2])] = float(hello[3])
         f.close()
         
     
@@ -90,31 +92,49 @@ class HabitParser:
 
     def time_to_last_item(self, item):
         "returns how long the item lasts: i.e number of servings"
-        return self.time_to_last_dict[item]
+        item_new = self.actual_item(item)
         
-
+        if item_new in self.time_to_last_dict:
+            return self.time_to_last_dict[item_new]
+        else: 
+            return 0
+        
     def isSublist(self, list_, sublist):
         "help function for get_frequency(item_list)"
         if not isinstance(list_, list):
             list_ = list(list_)
         sublen = len(sublist)
-        for i in xrange(len(list_)-sublen+1):
+        for i in range(len(list_)-sublen+1):
             if list_[i:i+sublen] == sublist:
                 return True
         return False
-                              
+    
+    def actual_item(self, item):
+        "help function. Given an item bread_c --> bread,item is string"
+        if item[-2:] == '_c' or item[-2:]=='_m':
+            return item[:-2]
+        else:
+            return item
+        
     def get_frequency(self,item_list):
         "item_list can be [item], [item1, item2], [item1,item2,item3]"
+        l = []
+        for il in item_list:
+            l.append(self.actual_item(il))
+            
         count = 0
         for i in  self.breakfast_file_toList:
-            if self.isSublist(i, item_list):
+            if self.isSublist(i, l):
                 count +=1
-        return count/float(self.length_breakfast_file_toList)                       
+        return count
 
     def get_preference(self, main, complement, drinks):
         "return preference for triplet ex: ('eggs', 'bread', '')"
-        if (main, complement, drinks) in self.preferences_dict:
-            return self.preferences_dict[(main, complement, drinks)]
+        main_c = self.actual_item(main)
+        complement_c = self.actual_item(complement)
+        drinks_c = self.actual_item(drinks)
+        if (main_c, complement_c, drinks_c) in self.preferences_dict:
+            return self.preferences_dict[(main_c, complement_c, drinks_c)]
         else:
             return None
 
