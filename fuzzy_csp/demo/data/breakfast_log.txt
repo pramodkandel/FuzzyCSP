@@ -1,0 +1,11 @@
+main 		| complement 	| drinks
+
+eggs 		| bread      	| milk
+bread		| jam           | juice
+oatmeal 	| apple         | milk
+eggs 		| bread      	| coffee
+bread		| jam           | coffee
+eggs 		| ham 		| coffee
+bread 		| ham		| juice
+pancakes	| syrup		| milk
+oatmeal		| sugar		| milk
