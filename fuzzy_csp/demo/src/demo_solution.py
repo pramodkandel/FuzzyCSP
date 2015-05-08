@@ -64,3 +64,9 @@ class DemoSolution:
 			return sols[len(sols)-n]
 		else:
 			return Error("exhausted total solutions")
+
+
+	def get_real_item(item_value):
+        if item_value[-2:] == '_c' or item_value[-2:]=='_m':
+            return item[:-2]
+        return item

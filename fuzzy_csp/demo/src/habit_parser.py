@@ -20,7 +20,7 @@ class HabitParser:
             lines = f.read().splitlines()
         for i in lines[2:]:
             hello = i.split('|')
-            hello = [k.strip(' \t\n') for k in hello]
+            hello = [k.strip(' \t+\n+') for k in hello]
             if hello!=['']:
                 self.breakfast_file_toList.append(hello)
         f.close()
@@ -48,7 +48,7 @@ class HabitParser:
             lines = f.read().splitlines()
             for i in lines[2:]:
                 hello = i.split(':')
-                hello = [k.strip(' \t\n') for k in hello]
+                hello = [k.strip(' \t+\n+') for k in hello]
                 if hello != ['']:
                     self.time_to_last_dict[hello[0]] = int(hello[1])
         f.close()
