@@ -19,7 +19,7 @@ def test_habit_to_fcsp():
 	habit_list = habit_parser.get_breakfastList
 	print "habit list is:", habit_list
 	for item in domain1:
-		#print "Time to last is for item", item, "is:", habit_parser.time_to_last_item(item)
+		print "Time to last is for item", item, "is:", habit_parser.time_to_last_item(item)
 		print "Frequency of use was", habit_parser.get_frequency([item])
 
 

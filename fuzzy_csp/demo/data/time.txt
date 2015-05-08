@@ -1,3 +1,14 @@
-item : servings
-eggs : 8
-milk : 12
+item    : servings
+
+eggs 	: 4
+bread   : 5
+milk    : 8
+jam	: 15
+juice   : 8
+oatmeal : 6
+apple	: 1
+coffee  : 10
+ham     : 7
+pancakes: 10
+syrup   : 16
+sugar   : 17

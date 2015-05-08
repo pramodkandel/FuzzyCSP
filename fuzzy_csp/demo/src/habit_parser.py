@@ -90,13 +90,7 @@ class HabitParser:
 
     def time_to_last_item(self, item):
         "returns how long the item lasts: i.e number of servings"
-
-        #TODO: Every item needs to have time to last, so make sure it happens.
-        # shouldn't return None
-        if item in self.time_to_last_dict:
-            return self.time_to_last_dict[item]
-        else: 
-            return 0
+        return self.time_to_last_dict[item]
         
 
     def isSublist(self, list_, sublist):
