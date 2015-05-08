@@ -111,11 +111,12 @@ class HabitParser:
                 count +=1
         return count/float(self.length_breakfast_file_toList)                       
 
-    def get_preference(self, main, complement, drinks):
+    def get_preference(self, items):
+        main = items[0]
+        complement = items[1]
+        drinks = items[2]
         "return preference for triplet ex: ('eggs', 'bread', '')"
-        if (main, complement, drinks) in self.preferences_dict:
-            return self.preferences_dict[(main, complement, drinks)]
-        else:
-            return None
+        return self.preferences_dict[(main, complement, drinks)]
+
 
         
