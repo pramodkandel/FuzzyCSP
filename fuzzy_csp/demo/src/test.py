@@ -17,6 +17,12 @@ def test_habit_to_fcsp():
 	print "Habit vars are:", variables
 	domains = habit_parser.get_domains()
 	print "Habit domains are:", domains
+
+	#test for bread_c and bread_m
+	print "time to last for bread_c is", habit_parser.time_to_last_item("bread_c")
+	print "ttl for bread_m is", habit_parser.time_to_last_item("bread_m")
+	print "freq for bread_m is", habit_parser.get_frequency("bread_m")
+	print "freq for bread_c is", habit_parser.get_frequency("bread_c")
 	domain1 = domains[0]
 	habit_list = habit_parser.get_breakfastList()
 	print "habit list is:", habit_list
@@ -32,24 +38,31 @@ def test_habit_to_fcsp():
 		pref = habit_parser.get_preference(triplet)
 		print "Preference for ", triplet, "is", pref
 
+	print "------------FINISHED HABIT PARSER TEST-------------"
 	habit_to_fcsp = HabitToFCSP(habit_parser)
+	print "Availability Problem.."
 	avail_problem = habit_to_fcsp.get_availability_fcsp()
+	print "Desirability Problem.."
 	desire_problem = habit_to_fcsp.get_desirability_fcsp()
+	print "Combined Problem.."
 	combine_problem = habit_to_fcsp.get_combined_fcsp()
 	demo_sol = DemoSolution(avail_problem, desire_problem, combine_problem)
 	demo_sol.set_m(m)
 	m_sols = demo_sol.get_m_best_availability_sols()
+	print "--------availability sols -----------"
 	print "m best availability sols: ",m_sols
 	print "satisf degrees:", demo_sol.availability_sats
 
 	print "nth best sol: ", demo_sol.get_nth_best_availability_solution(2)
 
+	print "--------desirability sols -----------"
 	m_sols = demo_sol.get_m_best_desirability_sols()
 	print "m best desirability sols: ",m_sols
 	print "satisf degrees:", demo_sol.desirability_sats
 
 	print "nth best sol: ", demo_sol.get_nth_best_desirability_solution(2)
 
+	print "--------combined sols -----------"
 	m_sols = demo_sol.get_m_best_combined_sols()
 	print "m best combined sols: ",m_sols
 	print "satisf degrees:", demo_sol.combined_sats

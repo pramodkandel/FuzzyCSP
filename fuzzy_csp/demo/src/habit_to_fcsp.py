@@ -4,6 +4,8 @@ import itertools
 from fuzzy_csp.src.fuzzy_cs_problem import FuzzyCSProblem
 
 class HabitToFCSP:
+	#preference score for 2 items if the user hasn't given yet, for combined pref score
+	INDIFFERENCE_PREF_SCORE = 0.5 
 	def __init__(self, habit_parser):
 		self.habit = habit_parser
 		self.variables = habit_parser.get_variables()
@@ -44,6 +46,7 @@ class HabitToFCSP:
 		print "domains are",domains
 		#for each pair of variables' values, we need to build constraints
 		constraints = self.get_combined_constraints()
+		
 		print "constraints are",constraints
 		return FuzzyCSProblem(variables, domains, constraints)
 
@@ -55,15 +58,15 @@ class HabitToFCSP:
 		constraints = []
 		var_combos = itertools.combinations(variables, 2)
 		for binary_vars in var_combos:
-			print "Vars for constraint are", binary_vars
+			#print "Vars for constraint are", binary_vars
 			fuzzy_constraints = {}
 			domain1 = self.habit.get_domain(binary_vars[0])
 			domain2 = self.habit.get_domain(binary_vars[1])
 			value_combos = itertools.product(list(domain1), list(domain2))
 			for values in value_combos:
-				print "Current values are", values
+				#print "Current values are", values
 				score = self.get_pair_availability_score(values)
-				print "Score for the value is", score
+				#print "Score for the value is", score
 				indiv_constr = self.get_instance_tuple_with_vars(binary_vars, values)
 				fuzzy_constraints[tuple(indiv_constr)] = score
 			if len(fuzzy_constraints)>0:
@@ -76,15 +79,15 @@ class HabitToFCSP:
 		constraints = []
 		var_combos = itertools.combinations(variables, 2)
 		for binary_vars in var_combos:
-			print "Vars for constraint are", binary_vars
+			#print "Vars for constraint are", binary_vars
 			fuzzy_constraints = {}
 			domain1 = self.habit.get_domain(binary_vars[0])
 			domain2 = self.habit.get_domain(binary_vars[1])
 			value_combos = itertools.product(list(domain1), list(domain2))
 			for values in value_combos:
-				print "Current values are", values
+				#print "Current values are", values
 				score = self.get_pair_desirability_score(binary_vars,values)
-				print "Score for the value is", score
+				#print "Score for the value is", score
 				indiv_constr = self.get_instance_tuple_with_vars(binary_vars, values)
 				if score != None:
 					fuzzy_constraints[tuple(indiv_constr)] = score
@@ -97,16 +100,16 @@ class HabitToFCSP:
 		constraints = []
 		var_combos = itertools.combinations(variables, 2)
 		for binary_vars in var_combos:
-			print "Vars for constraint are", binary_vars
+			#print "Vars for constraint are", binary_vars
 			fuzzy_constraints = {}
 			domain1 = self.habit.get_domain(binary_vars[0])
 			domain2 = self.habit.get_domain(binary_vars[1])
 			value_combos = itertools.product(list(domain1), list(domain2))
 			for values in value_combos:
-				print "Current values are", values
+				#print "Current values are", values
 				score = self.get_pair_combined_score(binary_vars,values)
-				print "Score for the value is", score
-				indiv_constr = get_instance_tuple_with_vars(binary_vars, values)
+				#print "Score for the value is", score
+				indiv_constr = self.get_instance_tuple_with_vars(binary_vars, values)
 				if score != None:
 					fuzzy_constraints[tuple(indiv_constr)] = score
 			if len(fuzzy_constraints) > 0:
@@ -128,7 +131,7 @@ class HabitToFCSP:
 			if value == None:
 				value = ""
 			vars_list.append(value)
-		print "Getting preference from habit parser for", vars_list
+		#print "Getting preference from habit parser for", vars_list
 		return self.habit.get_preference(vars_list)
 
 
@@ -164,10 +167,10 @@ class HabitToFCSP:
 		return (score1*score2)**0.5
 
 
-	def get_pair_combined_score(self, pair_of_items):
-		score1 = self.get_availability_score(pair_of_items)
-		score2 = self.get_desirability_score(pair_of_items)
+	def get_pair_combined_score(self, variables, values):
+		score1 = self.get_pair_availability_score(values)
+		score2 = self.get_pair_desirability_score(variables, values)
 		#desirability score could be None
 		if score2 == None:
-			score2 = 0.5 # Assuming that if user had no preference, he's 50/50 on it
+			score2 = self.INDIFFERENCE_PREF_SCORE 
 		return (score1*score2)**0.5
