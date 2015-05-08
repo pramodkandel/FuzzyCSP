@@ -546,7 +546,7 @@ class FuzzyCSSolution:
 			return solution
 
 	#a function for returning m-best solutions
-	def get_m_best_solutions(self, m):
+	def get_m_best_solutions_backtracking(self, m):
 		m_soln_dict = {} #will stop growing when it reaches m
 
 		import sys
@@ -558,6 +558,64 @@ class FuzzyCSSolution:
 			return degree_sorted_solns[(len(degree_sorted_solns)-m):]
 		else:
 			return degree_sorted_solns
+
+
+	def get_m_best_solutions_branch_n_bound(self,m):
+		graph = self.get_search_tree()
+		root_variable = self.problem.get_variables()[0]
+		root_values = self.problem.get_domain(root_variable)		
+
+		lower_bound = 0
+
+		m_solutions = []
+		m_sat_degrees = []
+		current_min_sat = float('inf')
+		#create initial stack with the root variables
+		stack = []
+		for root_val in root_values:
+			stack.append((root_val, [root_val]))
+
+		while stack:
+			#print "bnb stack is", stack
+			(vertex, path) = stack.pop(0)
+			if self.do_benchmark:
+				FuzzyBenchmarkMetrics.num_var_assignments += 1
+			#print "bnb vertex is", vertex
+			#print "bnb path is", path
+			for next in graph[vertex]:
+				#check if the path with next variable has better joint_sat than current max
+				next_partial_assignment = path+[next];
+				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
+				#upper bound for branch_and_bound
+				upper_bound = 1.0
+				if self.get_upper_bound_type() == "appropriateness":
+					upper_bound = self.get_appropriateness(partial_vars, next_partial_assignment)
+				elif self.get_upper_bound_type() == "partial_joint_sat":
+					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
+				
+				if upper_bound < lower_bound:
+					#prune/don't go to this branch
+					continue
+					
+				if graph[next] == []: # next vertex is the leaf
+					instance = tuple(path + [next])
+					#print "Instance is", instance
+					joint_sat = self.get_joint_satisfaction_degree(instance)
+					if joint_sat >= alpha:
+						if len(m_solutions) < m:
+							m_solutions.append(instance)
+						else:
+							if joint_sat < current_min_sat:
+								min_index = m_sat_degrees.index(current_min_sat)
+								m_solutions[min_index] = instance
+				else:
+					stack = [(next, path+[next])] + stack		
+
+
+
+
+
+
 
 
 #have to put here because putting inside fuzzy_benchmark_test caused circular dependency

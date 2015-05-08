@@ -58,7 +58,7 @@ class HabitParser:
               lines = f.read().splitlines()
               for i in lines[2:]:
                 hello = i.split('|')
-                hello = [k.strip(' t\n') for k in hello]
+                hello = [k.strip(' \n+\t+') for k in hello]
                 if hello != ['']:
                     self.preferences_dict[(hello[0],hello[1], hello[2])] = float(hello[3])
         f.close()
@@ -128,14 +128,20 @@ class HabitParser:
                 count +=1
         return count
 
-    def get_preference(self, main, complement, drinks):
-        "return preference for triplet ex: ('eggs', 'bread', '')"
+    def get_preference(self, items):
+        main = items[0]
+        complement = items[1]
+        drinks = items[2]
+        "return preference for triplet of items ex: ('eggs', 'bread', '')"
+
         main_c = self.actual_item(main)
         complement_c = self.actual_item(complement)
         drinks_c = self.actual_item(drinks)
+        
         if (main_c, complement_c, drinks_c) in self.preferences_dict:
             return self.preferences_dict[(main_c, complement_c, drinks_c)]
         else:
             return None
+
 
         
