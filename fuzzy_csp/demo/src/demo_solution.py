@@ -1,3 +1,6 @@
+#from fuzzy_csp.src.fuzzy_cs_problem import FuzzyCSProblem
+from fuzzy_csp.src.fuzzy_cs_solution import FuzzyCSSolution
+
 #solutions for demo
 class DemoSolution:
 
@@ -6,42 +9,58 @@ class DemoSolution:
 		self.desirability_solution = FuzzyCSSolution(desirability_problem)
 		self.combined_solution = FuzzyCSSolution(combined_problem)
 		self.m = m
-		self.best_availability_sols = None
-		self.best_desirability_sols = None
-		self.best_combined_sols = None
+		self.best_availability_sols = []
+		self.availability_sats = []
+		self.best_desirability_sols = []
+		self.desirability_sats = []
+		self.best_combined_sols = []
+		self.combined_sats = []
+
+	def set_m(self,m):
+		self.m=m
+
+
 
 	def get_m_best_availability_sols(self):
-		if self.best_availability_sols == None:
-			self.best_availability_sols = self.availability_solution.get_m_best_solutions(self.m)
+		if self.best_availability_sols == []:
+			m_best_sols = self.availability_solution.get_m_best_solutions(self.m)
+			self.best_availability_sols = m_best_sols
+			self.availability_sats = [self.availability_solution.get_joint_satisfaction_degree(sol) for sol in m_best_sols]
 		return self.best_availability_sols
 
 	def get_m_best_desirability_sols(self):
-		if self.best_desirability_sols == None:
-			self.best_desirability_sols = self.desirability_solution.get_m_best_solutions(self.m)
-		return self.best_availability_sols
+		if self.best_desirability_sols == []:
+			m_best_sols = self.desirability_solution.get_m_best_solutions(self.m)
+			self.best_desirability_sols = m_best_sols
+			self.desirability_sats = [self.desirability_solution.get_joint_satisfaction_degree(sol) for sol in m_best_sols]
+		return self.best_desirability_sols
 
 	def get_m_best_combined_sols(self):
-		if self.best_combined_sols == None:
-			self.best_combined_sols = self.combined_solution.get_m_best_solutions(self.m)
-		return self.best_availability_sols
+		if self.best_combined_sols == []:
+			m_best_sols = self.combined_solution.get_m_best_solutions(self.m)
+			self.best_combined_sols = m_best_sols
+			self.combined_sats = [self.combined_solution.get_joint_satisfaction_degree(sol) for sol in m_best_sols]
+		return self.best_combined_sols
+
+
 
 	def get_nth_best_availability_solution(self,n):
 		sols = self.get_m_best_availability_sols()
 		if n<= len(sols):
-			return sols[len(sols)-1 -n]
+			return sols[len(sols)-n]
 		else:
 			return False
 
 	def get_nth_best_desirability_solution(self,n):
 		sols = self.get_m_best_desirability_sols()
 		if n<= len(sols):
-			return sols[len(sols)-1 -n]
+			return sols[len(sols)-n]
 		else:
-			return False
+			raise Error("exhausted total solutions..")
 
 	def get_nth_best_combined_solution(self,n):
 		sols = self.get_m_best_combined_sols()
 		if n<= len(sols):
-			return sols[len(sols)-1 -n]
+			return sols[len(sols)-n]
 		else:
-			return False
+			return Error("exhausted total solutions")

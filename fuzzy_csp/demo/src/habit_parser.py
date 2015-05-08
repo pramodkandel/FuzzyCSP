@@ -132,7 +132,7 @@ class HabitParser:
         main = items[0]
         complement = items[1]
         drinks = items[2]
-        "return preference for triplet ex: ('eggs', 'bread', '')"
+        "return preference for triplet of items ex: ('eggs', 'bread', '')"
 
         main_c = self.actual_item(main)
         complement_c = self.actual_item(complement)
@@ -140,7 +140,7 @@ class HabitParser:
         if (main_c, complement_c, drinks_c) in self.preferences_dict:
             return self.preferences_dict[(main_c, complement_c, drinks_c)]
         else:
-            return False
+            return None
 
 
         
