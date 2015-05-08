@@ -12,15 +12,15 @@ def test_habit_to_fcsp():
 	#first test habit parser
 	habit_parser = HabitParser(brkfast_file, ttl_file, pref_file)
 	variables = habit_parser.get_variables()
-	print "Habit vars are:", variables
+	print ("Habit vars are:"), variables
 	domains = habit_parser.get_domains()
-	print "Habit domains are:", domains
+	print ("Habit domains are:"), domains
 	domain1 = domains[0]
-	habit_list = habit_parser.get_breakfastList
-	print "habit list is:", habit_list
+	habit_list = habit_parser.get_breakfastList()
+	print ("habit list is:"), habit_list
 	for item in domain1:
-		print "Time to last is for item", item, "is:", habit_parser.time_to_last_item(item)
-		print "Frequency of use was", habit_parser.get_frequency([item])
+		print ("Time to last is for item", item, "is:", habit_parser.time_to_last_item(item))
+		print ("Frequency of use was", habit_parser.get_frequency([item]))
 
 
 	habit_to_fcsp = HabitToFCSP(habit_parser)
