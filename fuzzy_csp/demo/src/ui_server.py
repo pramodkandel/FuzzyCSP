@@ -10,6 +10,7 @@ from flask_restful import reqparse
 app = Flask(__name__)
 @app.route("/")
 def hello():
+	
 	return '{"combined" : {"main":"M1","side":"S1","drink":"D1"}, "desirability" : {"main":"M2","side":"S2","drink":"D2"}, "availability" : {"main":"M3","side":"S3","drink":"D3"}}'
 
 @app.route("/sendNextPreference")

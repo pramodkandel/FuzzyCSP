@@ -61,12 +61,13 @@ class DemoSolution:
 	def get_nth_best_combined_solution(self,n):
 		sols = self.get_m_best_combined_sols()
 		if n<= len(sols):
-			return sols[len(sols)-n]
+			soln = sols[len(sols)-n]
+
 		else:
 			return Error("exhausted total solutions")
 
 
 	def get_real_item(item_value):
-        if item_value[-2:] == '_c' or item_value[-2:]=='_m':
-            return item[:-2]
-        return item
+		if item_value[-2:] == '_c' or item_value[-2:]=='_m':
+			return item_value[:-2]
+		return item_value
