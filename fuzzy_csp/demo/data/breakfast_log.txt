@@ -1,3 +1,5 @@
+main 		| complement 	| drinks
+
 eggs 		| bread      	| milk
 bread		| jam           | juice
 oatmeal 	| apple         | milk

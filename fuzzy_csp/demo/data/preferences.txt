@@ -23,3 +23,4 @@ pancakes|		| milk		| 0.8
 	| syrup		| milk		| 0.4
 oatmeal	| sugar		|		| 0.6
 	| sugar		| milk		| 0.5
+

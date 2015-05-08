@@ -5,8 +5,8 @@ from demo_solution import DemoSolution
 
 def test_habit_to_fcsp():
 	data_path = '/home/pramod/Documents/spring_2015/cog_rob-6834/FuzzyCSP/fuzzy_csp/demo/data/'
-	brkfast_file = data_path + 'small_file.txt'
-	ttl_file = data_path + 'time.txt'
+	brkfast_file = data_path + 'breakfast_log.txt'
+	ttl_file = data_path + 'time_to_last.txt'
 	pref_file = data_path + 'preferences.txt'
 
 	#first test habit parser
