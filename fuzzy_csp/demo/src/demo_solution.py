@@ -47,14 +47,16 @@ class DemoSolution:
 	def get_nth_best_availability_solution(self,n):
 		sols = self.get_m_best_availability_sols()
 		if n<= len(sols):
-			return sols[len(sols)-n]
+			soln = sols[len(sols)-n]
+			return self.get_real_sol(soln)
 		else:
 			return False
 
 	def get_nth_best_desirability_solution(self,n):
 		sols = self.get_m_best_desirability_sols()
 		if n<= len(sols):
-			return sols[len(sols)-n]
+			soln = sols[len(sols)-n]
+			return self.get_real_sol(soln)
 		else:
 			raise Error("exhausted total solutions..")
 
@@ -62,12 +64,16 @@ class DemoSolution:
 		sols = self.get_m_best_combined_sols()
 		if n<= len(sols):
 			soln = sols[len(sols)-n]
-
+			return self.get_real_sol(soln)
 		else:
 			return Error("exhausted total solutions")
 
 
-	def get_real_item(item_value):
-		if item_value[-2:] == '_c' or item_value[-2:]=='_m':
-			return item_value[:-2]
-		return item_value
+	def get_real_sol(self, solution):
+		sol = []
+		for item_value in solution:
+			if item_value[-2:] == '_c' or item_value[-2:]=='_m':
+				sol.append(item_value[:-2])
+			else:
+				sol.append(item_value)
+		return tuple(sol)

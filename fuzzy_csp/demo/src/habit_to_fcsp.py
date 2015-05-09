@@ -20,34 +20,34 @@ class HabitToFCSP:
 
 	def get_availability_fcsp(self):
 		variables = self.get_variables()
-		print "variables are",variables
+		#print "variables are",variables
 		domains = self.get_domains()
-		print "domains are",domains
+		#print "domains are",domains
 		#for each pair of variables' values, we need to build constraints
 		constraints = self.get_availability_constraints()
-		print "constraints are",constraints
+		#print "constraints are",constraints
 		return FuzzyCSProblem(variables, domains, constraints)
 
 
 	def get_desirability_fcsp(self):
 		variables = self.get_variables()
-		print "variables are",variables
+		#print "variables are",variables
 		domains = self.get_domains()
-		print "domains are",domains
+		#print "domains are",domains
 		#for each pair of variables' values, we need to build constraints
 		constraints = self.get_desirability_constraints()
-		print "constraints are", constraints
+		#print "constraints are", constraints
 		return FuzzyCSProblem(variables, domains, constraints)
 
 	def get_combined_fcsp(self):
 		variables = self.get_variables()
-		print "variables are", variables
+		#print "variables are", variables
 		domains = self.get_domains()
-		print "domains are",domains
+		#print "domains are",domains
 		#for each pair of variables' values, we need to build constraints
 		constraints = self.get_combined_constraints()
 		
-		print "constraints are",constraints
+		#print "constraints are",constraints
 		return FuzzyCSProblem(variables, domains, constraints)
 
 

@@ -121,6 +121,7 @@ class HabitParser:
         l = []
         for il in item_list:
             l.append(self.actual_item(il))
+        #print l
             
         count = 0
         for i in  self.breakfast_file_toList:
