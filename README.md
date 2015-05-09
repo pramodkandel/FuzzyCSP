@@ -8,13 +8,13 @@ Instructions to configure the project:
 
 1. Download or clone this project.
 
-2. From the root directory(where setup.py file is), run this in terminal: sudo python setup.py install . This makes sure the package installs correctly in your system.
+2. From the main project directory(where setup.py file is), run this in terminal: "sudo python setup.py install" . This makes sure the package installs correctly in your system.
 
-3a. To see an example of all the public API use, see test/fuzzy_cs_api_test.py. You can run it with this command: python fuzzy_cs_api_test.py
+3a. To see an example of all the public API use, see test/fuzzy_cs_api_test.py.In the terminal,you can run it with this command: "python fuzzy_cs_api_test.py"
 
-3b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py You can run each file by opening it and running the code (Run Module F5). 
+3b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py.  
 
-Make sure you have PyEvolve installed, and active in the shell you are running the files in. Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# .
+Before running those files,make sure you have PyEvolve installed, and active in the shell you are running the files in. Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# .
 
 4. Unit tests for internal functions are placed in test/fuzzy_cs_unittest.py, which you can run as well.
 
