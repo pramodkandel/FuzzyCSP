@@ -23,21 +23,21 @@ class DemoSolution:
 
 	def get_m_best_availability_sols(self):
 		if self.best_availability_sols == []:
-			m_best_sols = self.availability_solution.get_m_best_solutions(self.m)
+			m_best_sols = self.availability_solution.get_m_best_solutions_branch_n_bound(self.m)
 			self.best_availability_sols = m_best_sols
 			self.availability_sats = [self.availability_solution.get_joint_satisfaction_degree(sol) for sol in m_best_sols]
 		return self.best_availability_sols
 
 	def get_m_best_desirability_sols(self):
 		if self.best_desirability_sols == []:
-			m_best_sols = self.desirability_solution.get_m_best_solutions(self.m)
+			m_best_sols = self.desirability_solution.get_m_best_solutions_branch_n_bound(self.m)
 			self.best_desirability_sols = m_best_sols
 			self.desirability_sats = [self.desirability_solution.get_joint_satisfaction_degree(sol) for sol in m_best_sols]
 		return self.best_desirability_sols
 
 	def get_m_best_combined_sols(self):
 		if self.best_combined_sols == []:
-			m_best_sols = self.combined_solution.get_m_best_solutions(self.m)
+			m_best_sols = self.combined_solution.get_m_best_solutions_branch_n_bound(self.m)
 			self.best_combined_sols = m_best_sols
 			self.combined_sats = [self.combined_solution.get_joint_satisfaction_degree(sol) for sol in m_best_sols]
 		return self.best_combined_sols

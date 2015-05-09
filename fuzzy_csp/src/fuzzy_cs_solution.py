@@ -548,13 +548,12 @@ class FuzzyCSSolution:
 	#a function for returning m-best solutions
 	def get_m_best_solutions_backtracking(self, m):
 		m_soln_dict = {} #will stop growing when it reaches m
-
 		import sys
 		for solution in self.get_alpha_solutions_backtracking(sys.float_info.epsilon):
 			sat_degree = self.get_joint_satisfaction_degree(solution)
 			m_soln_dict[solution] = sat_degree
 		degree_sorted_solns = sorted(m_soln_dict, key=lambda k: m_soln_dict[k])
-		if m>=len(degree_sorted_solns):
+		if m<=len(degree_sorted_solns):
 			return degree_sorted_solns[(len(degree_sorted_solns)-m):]
 		else:
 			return degree_sorted_solns
@@ -593,7 +592,7 @@ class FuzzyCSSolution:
 				elif self.get_upper_bound_type() == "partial_joint_sat":
 					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
 				
-				if upper_bound < lower_bound:
+				if upper_bound <= lower_bound:
 					#prune/don't go to this branch
 					continue
 					
@@ -601,16 +600,27 @@ class FuzzyCSSolution:
 					instance = tuple(path + [next])
 					#print "Instance is", instance
 					joint_sat = self.get_joint_satisfaction_degree(instance)
-					if joint_sat >= alpha:
-						if len(m_solutions) < m:
-							m_solutions.append(instance)
-						else:
-							if joint_sat < current_min_sat:
-								min_index = m_sat_degrees.index(current_min_sat)
-								m_solutions[min_index] = instance
-				else:
-					stack = [(next, path+[next])] + stack		
 
+					if len(m_solutions) < m:
+						m_solutions.append(instance)
+						m_sat_degrees.append(joint_sat)
+						if (len(m_solutions) == m): #after appending above
+							current_min_sat = min(m_sat_degrees)
+							lower_bound = current_min_sat
+					else:
+						if joint_sat > current_min_sat:
+							min_index = m_sat_degrees.index(current_min_sat)
+							m_solutions[min_index] = instance
+							m_sat_degrees[min_index] = joint_sat
+							current_min_sat = min(m_sat_degrees)
+							lower_bound = current_min_sat
+				else:
+					stack = [(next, path+[next])] + stack
+		sorted_sols_with_sats = sorted(zip(m_sat_degrees, m_solutions))
+		print "sorted zip is", sorted_sols_with_sats
+		m_sols_ascending = [sol for (sat, sol) in sorted_sols_with_sats]
+		print "sorted sols are", m_sols_ascending
+		return m_sols_ascending
 
 
 

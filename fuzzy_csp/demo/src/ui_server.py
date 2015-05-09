@@ -6,7 +6,7 @@ from habit_parser import HabitParser
 from habit_to_fcsp import HabitToFCSP
 from demo_solution import DemoSolution
 from flask_restful import reqparse
-
+import json
 
 ####GLOBAL VARIABLES##########
 data_path = '/home/pramod/Documents/spring_2015/cog_rob-6834/FuzzyCSP/fuzzy_csp/demo/data/'
@@ -53,12 +53,9 @@ def hello():
 	desirability = demo_sol.get_nth_best_desirability_solution(1)
 	
 	availability = demo_sol.get_nth_best_availability_solution(1)
-	#return '{"combined" : {"main":"M1","side":"S1","drink":"D1"}, "desirability" : {"main":"M2","side":"S2","drink":"D2"}, "availability" : {"main":"M3","side":"S3","drink":"D3"}}'
-	print "availability is", availability
+	#print "availability is", availability
 	response_str = get_response_string(combined,desirability,availability)
-	print response_str
 	return response_str
-
 
 @app.route("/sendNextPreference")
 def sendMainPreference():
@@ -67,9 +64,15 @@ def sendMainPreference():
 	args = parser.parse_args()
 	print "Args are", args
 	#print args = {'attempt': 1}
-	return '{"combined" : {"main":"M11","side":"S11","drink":"D11"}, "desirability" : {"main":"M21","side":"S21","drink":"D21"}, "availability" : {"main":"M31","side":"S31","drink":"D31"}}'
+	attempt_num = args['attempt'] + 1
 
+	combined = demo_sol.get_nth_best_combined_solution(attempt_num)
+	desirability = demo_sol.get_nth_best_desirability_solution(1)
+	
+	availability = demo_sol.get_nth_best_availability_solution(1)
 
+	response_str = get_response_string(combined,desirability,availability)
+	return response_str
 
 
 def get_stock_solution(sol):
@@ -83,7 +86,9 @@ def get_response_string(combined, desirability, availability):
 	response_dict["combined"] = get_response_sol(combined)
 	response_dict["desirability"] = get_response_sol(desirability)
 	response_dict["availability"] = get_response_sol(availability)
-	return JSON.stringify(response_dict)
+	print "response_dict:", response_dict
+	#return response_dict
+	return json.dumps(response_dict)
 
 #TODO: Doesn't make sense to hardcode variables
 def get_response_sol(sol):
