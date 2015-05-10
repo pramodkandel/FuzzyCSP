@@ -9,7 +9,7 @@ from flask_restful import reqparse
 import json
 
 ####GLOBAL VARIABLES##########
-data_path = '/home/pramod/Documents/spring_2015/cog_rob-6834/FuzzyCSP/fuzzy_csp/demo/data/'
+data_path = '../data/'
 brkfast_file = data_path + 'breakfast_log.txt'
 ttl_file = data_path + 'time_to_last.txt'
 pref_file = data_path + 'preferences.txt'
