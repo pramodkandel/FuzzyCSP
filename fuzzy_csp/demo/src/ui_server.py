@@ -13,7 +13,7 @@ data_path = '../data/'
 brkfast_file = data_path + 'breakfast_log.txt'
 ttl_file = data_path + 'time_to_last.txt'
 pref_file = data_path + 'preferences.txt'
-m = 5 #for m-best sols
+m = 10 #for m-best sols
 done_startup = False
 
 ######END GLOBAL VARIABLES ########
@@ -47,53 +47,77 @@ startup()
 
 app = Flask(__name__)
 @app.route("/")
-def hello():
-	print "Came to hello!"
+def initial():
 	combined = demo_sol.get_nth_best_combined_solution(1)
-	desirability = demo_sol.get_nth_best_desirability_solution(1)
-	
-	availability = demo_sol.get_nth_best_availability_solution(1)
-	#print "availability is", availability
-	response_str = get_response_string(combined,desirability,availability)
-	return response_str
+	return send_response(combined)
 
 @app.route("/sendNextPreference")
 def sendMainPreference():
 	parser = reqparse.RequestParser()
 	parser.add_argument('attempt', type=int)
+	parser.add_argument('sol_type', type=str)
+	parser.add_argument('want', type=str)
+	parser.add_argument('no_want', type=str)
+	parser.add_argument('rejected_sols', type=str)
 	args = parser.parse_args()
+	#print "Parser is", parser
 	print "Args are", args
-	#print args = {'attempt': 1}
-	attempt_num = args['attempt'] + 1
+	attempt_num = args['attempt']
+	sol_type = args['sol_type']
+	rejected_sols = parse_client_rejected_sols(args['rejected_sols'])
+	print "rejected sols are", rejected_sols
+	sol = list(get_solution(sol_type, attempt_num, rejected_sols))
+	return send_response(sol)
 
-	combined = demo_sol.get_nth_best_combined_solution(attempt_num)
-	desirability = demo_sol.get_nth_best_desirability_solution(1)
-	
-	availability = demo_sol.get_nth_best_availability_solution(1)
 
-	response_str = get_response_string(combined,desirability,availability)
-	return response_str
+def parse_client_rejected_sols(string_rej_sols):
+	if string_rej_sols.strip() == "":
+		return []
+	sols = []
+	rej_list = string_rej_sols.split(",")
+	for i in range(len(rej_list)/3):
+		sol = tuple(rej_list[3*i:3*i+3])
+		sols.append(sol)
+	return sols
 
+def send_response(sol):
+	stock = get_stock_solution(sol)
+	response_dict = {"sol":sol, "stock":stock}
+	#response str should be: {"sol":["bread","jam","milk"], "stock":[0,2,1]}
+	print "The response to be sent is: ", response_dict
+	return json.dumps(response_dict)
+
+def get_solution(sol_type, attempt_num, rejected_sols):
+	if sol_type == "availability":
+		sol = demo_sol.get_nth_best_availability_solution(attempt_num)
+		if sol in rejected_sols:
+			sol= get_solution(sol_type, attempt_num+1, rejected_sols)
+	elif sol_type == "desirability":
+		sol= demo_sol.get_nth_best_desirability_solution(attempt_num)
+		if sol in rejected_sols:
+			sol= get_solution(sol_type, attempt_num+1, rejected_sols)
+	elif sol_type == "combined":
+		sol = demo_sol.get_nth_best_combined_solution(attempt_num)
+		if sol in rejected_sols:
+			sol= get_solution(sol_type, attempt_num+1, rejected_sols)
+	else:
+		raise Error("Solution type input is wrong!")
+
+	return sol
 
 def get_stock_solution(sol):
 	stock = []
 	for item in sol:
-		stock.append(habit_to_fcsp.get_availability_score(item))
+		score = habit_to_fcsp.get_availability_score(item)
+		if score == 0:
+			stock.append(0)
+		elif score <= 0.25:
+			stock.append(1)
+		else:
+			stock.append(2)
 	return stock
 
-def get_response_string(combined, desirability, availability):
-	response_dict = {}
-	response_dict["combined"] = get_response_sol(combined)
-	response_dict["desirability"] = get_response_sol(desirability)
-	response_dict["availability"] = get_response_sol(availability)
-	print "response_dict:", response_dict
-	#return response_dict
-	return json.dumps(response_dict)
 
-#TODO: Doesn't make sense to hardcode variables
-def get_response_sol(sol):
-	response_sol = {"main":sol[0], "side":sol[1], "drink":sol[2]}
-	return response_sol
 
 if __name__ == "__main__":
 	app.run()

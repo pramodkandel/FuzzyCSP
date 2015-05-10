@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Captain Fridge</title>
+    <script src="javascript/jquery-1.11.2.min.js"></script>
+    <script src="javascript/bootstrap-3.3.4-dist/js/bootstrap.min.js"></script>
+    <script src="javascript/UI_engine.js"></script>
+    <!-- Bootstrap -->
+    <link href="javascript/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap core CSS -->
+    <link href="javascript/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="javascript/bootstrap-3.3.4-dist/css/cover.css" rel="stylesheet">
+    <link href="css/demo_style.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+<body>
+<div class="jumbotron">
+<h3 style="color: black"> I'm Captain Breakfast. Nice to meet you! </h3>
+<img id="robot" src="images/forbidden-fruit.gif">
+</div>
+
+<div>
+<blockquote>
+    <div id = "robot_response_text"> </div> <br>
+
+    <div id = "human_response">
+        <div id="yes_no_div">
+            <input type="button" id="yes_btn" value="Sure!" style="color: black"> &nbsp; &nbsp; &nbsp;
+            <input type="button" id="no_btn" value="Not So Sure :(" style="color: black"> <br>
+        </div>
+
+        <form id= "after_reject_form">
+            Give me:
+            <input type="radio" name="bf_type" value="combined">next suggestion &nbsp; &nbsp; &nbsp;
+            <input type="radio" name="bf_type" value="desirability">my most favorite &nbsp; &nbsp; &nbsp;
+            <input type="radio" name="bf_type" value="availability">most available <br> <br>
+        	
+            I don't want <input name="no_want" type = text> </input> &nbsp; &nbsp; &nbsp;
+
+            I want <input name="want" type = text> </input> <br><br>
+
+            <input type="submit" name = "submit" value="Submit">
+        </form>
+    </div>
+
+</blockquote>
+</div>
+</body>
+</html>

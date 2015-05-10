@@ -617,9 +617,9 @@ class FuzzyCSSolution:
 				else:
 					stack = [(next, path+[next])] + stack
 		sorted_sols_with_sats = sorted(zip(m_sat_degrees, m_solutions))
-		print "sorted zip is", sorted_sols_with_sats
+		#print "sorted zip is", sorted_sols_with_sats
 		m_sols_ascending = [sol for (sat, sol) in sorted_sols_with_sats]
-		print "sorted sols are", m_sols_ascending
+		#print "sorted sols are", m_sols_ascending
 		return m_sols_ascending
 
 
