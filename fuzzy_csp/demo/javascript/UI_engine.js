@@ -25,8 +25,9 @@ $(document).ready(function(){
 		//alert("No btn clicked.")
 		//$("#robot_response_text").hide()
 		rejected_sols.push(cur_sol)
+		show_rejected_sols(rejected_sols)
 		$("#yes_no_div").hide();
-		$("#after_reject_form").show();
+		request_new_input();
 	})
 
 
@@ -42,11 +43,33 @@ $(document).ready(function(){
     	}
 
     	type = values.bf_type;
-    	want_item = values.want;
-    	no_want_item = values.no_want;
+    	want_item = values.want.trim();
+    	no_want_item = values.no_want.trim();
     	attempt_num = update_and_get_attempt_num(type, false)
-    	if (want_item.trim().length > 0) {want_items.push(values.want);}
-    	if (no_want_item.trim().length>0){no_want_items.push(values.no_want);}
+    	if (want_item.length > 0) {
+    		if (want_items.indexOf(want_item) == -1){
+    			want_items.push(want_item);
+    		}
+
+    		//now check if user had said before they didn't want it
+    		no_want_index = no_want_items.indexOf(want_item)
+    		if (no_want_index > -1){
+    			no_want_items.splice(no_want_index,1)
+    		}
+    		
+    	}
+    	if (no_want_item.length>0){
+    		if (no_want_items.indexOf(no_want_item) == -1){
+    			no_want_items.push(no_want_item);
+    		}
+
+    		//now check if user had said before they wanted it. If so,
+    		//remove from want
+    		want_index = want_items.indexOf(no_want_item)
+    		if (want_index > -1){
+    			want_items.splice(want_index,1)
+    		}
+    	}
     	
     	data = {"want":want_items.join(), "no_want":no_want_items.join(), "sol_type":type, "attempt":attempt_num, "rejected_sols":rejected_sols.join()}
 		
@@ -57,6 +80,19 @@ $(document).ready(function(){
 
 });
 
+
+function show_rejected_sols(rejected_sols)
+{
+	show_text = ""
+	if (rejected_sols.length >0){
+		show_text = "Rejected:<br>"
+	}
+	for (var i=0; i<rejected_sols.length; i++){
+		soln = rejected_sols[i];
+		show_text += JSON.stringify(soln) + "<br>"
+	}
+	$("#rejected_info").html(show_text);
+}
 
 function update_and_get_attempt_num(type, do_reset)
 {
@@ -90,7 +126,17 @@ function getNextPreference(send_data) {
 		dataType: 'text'
 	}).done(function ( response ) {
 		//alert(response);
-		json_response = JSON.parse(response);	
+		json_response = JSON.parse(response);
+		if (json_response.sol == null){
+			str_response = "There is no breakfast combo available with "+
+			"those choices. Please start from the beginning";
+			give_robot_response(str_response);
+			//renew all variables
+			reset_all_variables();
+			$("#yes_no_div").hide();
+			request_new_input();
+			return;
+		}	
 		str_response = get_string_response(json_response, false)
 		give_robot_response(str_response);
 		
@@ -112,8 +158,20 @@ function getNextPreference(send_data) {
 
 function request_new_input(){
 	$( "#after_reject_form" ).show();
+	$( "#after_reject_form" )[0].reset();
 }
 
+function reset_all_variables(){
+	want_items = [];
+	no_want_items = [];
+	desire_attempt = 0;
+	available_attempt = 0;
+	combined_attempt = 1; //the very initial recommendation is the combined solution
+
+	rejected_sols = []
+	cur_sol = null;
+	rejected_num = 0;
+}
 
 //Displays the text and speaks the text as a robot response
 function give_robot_response(text){
@@ -142,13 +200,17 @@ function get_string_response(json_response, is_init){
 	sol_string = stringify_sol(sol);
 	sol_response = "";
 	if (is_init) {sol_response = "I recommend "+sol_string+ " for today's breakfast.";}
-	else {sol_response = "Next option is "+sol_string + ".";}
+	else {sol_response = "According to your choice, next best option is "+sol_string + ".";}
 	
 	stock_string = "";
 
 	for (var i=0; i<stock.length; i++){
 		if (stock[i] == 0){
 			stock_string = "However, "+sol[i] + " is out of stock. Please choose another option.";
+			//take the item out of "want_items" if it's there
+			if (want_items.indexOf(sol[i]) > -1){
+				want_items.splice(want_items.indexOf(sol[i]),1)
+			}
 			break;
 			
 		}else if (stock[i] == 1){

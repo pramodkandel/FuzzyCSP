@@ -33,30 +33,38 @@
 </div>
 
 <div>
-<blockquote>
-    <div id = "robot_response_text"> </div> <br>
+<div id="show_info">
+    <blockquote>
+        <div id="rejected_info"></div>
+    </blockquote>
+</div>
+<div id = "interaction">
+    <blockquote>
+    
+        <div id = "robot_response_text"> </div> <br>
 
-    <div id = "human_response">
-        <div id="yes_no_div">
-            <input type="button" id="yes_btn" value="Sure!" style="color: black"> &nbsp; &nbsp; &nbsp;
-            <input type="button" id="no_btn" value="Not So Sure :(" style="color: black"> <br>
+        <div id = "human_response">
+            <div id="yes_no_div">
+                <input type="button" id="yes_btn" value="Sure!"> &nbsp; &nbsp; &nbsp;
+                <input type="button" id="no_btn" value="Not So Sure :("> <br>
+            </div>
+
+            <form id= "after_reject_form">
+                Give me:
+                <input type="radio" name="bf_type" value="combined" checked>next suggestion &nbsp; &nbsp; &nbsp;
+                <input type="radio" name="bf_type" value="desirability">my most favorite &nbsp; &nbsp; &nbsp;
+                <input type="radio" name="bf_type" value="availability">most available <br> <br>
+            	
+                I don't want <input id = "no_want" name="no_want" type = text>  &nbsp; &nbsp; &nbsp;
+
+                I want <input id="want" name="want" type = text>  <br><br>
+
+                <input type="submit" name = "submit" value="Submit">
+            </form>
         </div>
+    </blockquote>
+</div>
 
-        <form id= "after_reject_form">
-            Give me:
-            <input type="radio" name="bf_type" value="combined">next suggestion &nbsp; &nbsp; &nbsp;
-            <input type="radio" name="bf_type" value="desirability">my most favorite &nbsp; &nbsp; &nbsp;
-            <input type="radio" name="bf_type" value="availability">most available <br> <br>
-        	
-            I don't want <input name="no_want" type = text> </input> &nbsp; &nbsp; &nbsp;
-
-            I want <input name="want" type = text> </input> <br><br>
-
-            <input type="submit" name = "submit" value="Submit">
-        </form>
-    </div>
-
-</blockquote>
 </div>
 </body>
 </html>

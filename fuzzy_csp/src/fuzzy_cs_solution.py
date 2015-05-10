@@ -624,7 +624,84 @@ class FuzzyCSSolution:
 
 
 
+	def get_m_best_fixed_solutions_branch_n_bound(self,m, want_items, no_want_items):
+		graph = self.get_search_tree()
+		root_variable = self.problem.get_variables()[0]
+		root_values = self.problem.get_domain(root_variable)		
 
+		lower_bound = 0
+
+		m_solutions = []
+		m_sat_degrees = []
+		current_min_sat = float('inf')
+		#create initial stack with the root variables
+		stack = []
+		for root_val in root_values:
+			stack.append((root_val, [root_val]))
+
+		while stack:
+			#print "bnb stack is", stack
+			(vertex, path) = stack.pop(0)
+			if self.do_benchmark:
+				FuzzyBenchmarkMetrics.num_var_assignments += 1
+			#print "bnb vertex is", vertex
+			#print "bnb path is", path
+			for next in graph[vertex]:
+				if next in no_want_items or vertex in no_want_items:
+					continue
+				#check if the path with next variable has better joint_sat than current max
+				next_partial_assignment = path+[next];
+				partial_vars = self.problem.get_variables()[:len(next_partial_assignment)]
+				#upper bound for branch_and_bound
+				upper_bound = 1.0
+				if self.get_upper_bound_type() == "appropriateness":
+					upper_bound = self.get_appropriateness(partial_vars, next_partial_assignment)
+				elif self.get_upper_bound_type() == "partial_joint_sat":
+					upper_bound = self.get_partial_joint_satisfaction(partial_vars, next_partial_assignment)
+				
+				if upper_bound <= lower_bound:
+					#prune/don't go to this branch
+					continue
+					
+				if graph[next] == []: # next vertex is the leaf
+					instance = tuple(path + [next])
+					
+					#check if solution has items wanted (it's an OR)
+					# i.e. if a solution contains any of the wanted items,
+					# it's a valid solution. 
+					sol_is_wanted = False
+					if len(want_items) == 0:
+						sol_is_wanted = True
+					for item in want_items:
+						if item in instance:
+							sol_is_wanted = True
+							break
+
+					if not sol_is_wanted:
+						continue
+					#print "Instance is", instance
+					joint_sat = self.get_joint_satisfaction_degree(instance)
+
+					if len(m_solutions) < m:
+						m_solutions.append(instance)
+						m_sat_degrees.append(joint_sat)
+						if (len(m_solutions) == m): #after appending above
+							current_min_sat = min(m_sat_degrees)
+							lower_bound = current_min_sat
+					else:
+						if joint_sat > current_min_sat:
+							min_index = m_sat_degrees.index(current_min_sat)
+							m_solutions[min_index] = instance
+							m_sat_degrees[min_index] = joint_sat
+							current_min_sat = min(m_sat_degrees)
+							lower_bound = current_min_sat
+				else:
+					stack = [(next, path+[next])] + stack
+		sorted_sols_with_sats = sorted(zip(m_sat_degrees, m_solutions))
+		#print "sorted zip is", sorted_sols_with_sats
+		m_sols_ascending = [sol for (sat, sol) in sorted_sols_with_sats]
+		#print "sorted sols are", m_sols_ascending
+		return m_sols_ascending
 
 
 

@@ -86,5 +86,12 @@ def test_habit_to_fcsp():
 	print "stock is:", stock
 
 
+	print "------------fixed solns---------------"
+	want = []
+	no_want = ['pancakes']
+	solutions = demo_sol.get_mbest_fix_solutions("availability",want, no_want)
+	print "Fixed solutions are", solutions
+
+
 if __name__ == '__main__':
 	test_habit_to_fcsp()

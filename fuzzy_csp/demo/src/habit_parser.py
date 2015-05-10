@@ -81,6 +81,13 @@ class HabitParser:
         "return domains"
         return self.domains
 
+    def get_all_items(self):
+        "return all domains as a list"
+        all_items = []
+        for domain in self.domains:
+            all_items.extend(domain)
+        return all_items
+
     def get_breakfastList(self):
         "returns every breakfast master had in the file as a list"
         return self.breakfast_file_toList

@@ -65,8 +65,23 @@ def sendMainPreference():
 	attempt_num = args['attempt']
 	sol_type = args['sol_type']
 	rejected_sols = parse_client_rejected_sols(args['rejected_sols'])
-	print "rejected sols are", rejected_sols
-	sol = list(get_solution(sol_type, attempt_num, rejected_sols))
+	#print "rejected sols are", rejected_sols
+
+
+	want_items = []
+	no_want_items = []
+	if len(args['want'].strip()) >0:
+		want_items = args['want'].strip().split(",")
+
+	if len(args['no_want'].strip())>0:
+		no_want_items = args['no_want'].strip().split(",")
+
+	print "Want items: ", want_items
+	print "No want items: ", no_want_items
+
+	candidate_solns = demo_sol.get_mbest_fix_solutions(sol_type, want_items, no_want_items)
+	print "candidate_solns are", candidate_solns
+	sol = get_next_solution(candidate_solns, 1, rejected_sols)
 	return send_response(sol)
 
 
@@ -81,29 +96,22 @@ def parse_client_rejected_sols(string_rej_sols):
 	return sols
 
 def send_response(sol):
+	if sol == None:
+		return json.dumps({"sol":None})
 	stock = get_stock_solution(sol)
 	response_dict = {"sol":sol, "stock":stock}
 	#response str should be: {"sol":["bread","jam","milk"], "stock":[0,2,1]}
 	print "The response to be sent is: ", response_dict
 	return json.dumps(response_dict)
 
-def get_solution(sol_type, attempt_num, rejected_sols):
-	if sol_type == "availability":
-		sol = demo_sol.get_nth_best_availability_solution(attempt_num)
-		if sol in rejected_sols:
-			sol= get_solution(sol_type, attempt_num+1, rejected_sols)
-	elif sol_type == "desirability":
-		sol= demo_sol.get_nth_best_desirability_solution(attempt_num)
-		if sol in rejected_sols:
-			sol= get_solution(sol_type, attempt_num+1, rejected_sols)
-	elif sol_type == "combined":
-		sol = demo_sol.get_nth_best_combined_solution(attempt_num)
-		if sol in rejected_sols:
-			sol= get_solution(sol_type, attempt_num+1, rejected_sols)
-	else:
-		raise Error("Solution type input is wrong!")
+def get_next_solution(candidate_solns, attempt_num, rejected_sols):
+	if attempt_num > len(candidate_solns):
+		return None
+	next_sol = candidate_solns[len(candidate_solns)-attempt_num]
+	if next_sol in rejected_sols:
+		next_sol = get_next_solution(candidate_solns, attempt_num+1, rejected_sols)
+	return next_sol
 
-	return sol
 
 def get_stock_solution(sol):
 	stock = []

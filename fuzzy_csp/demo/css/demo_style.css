@@ -1,3 +1,14 @@
+body{
+	color: #17837F;
+}
+
+#show_info{
+	float:left;
+	width:150px;
+	max-width: 150px;
+}
+
+
 #robot_response_text{
 
 }

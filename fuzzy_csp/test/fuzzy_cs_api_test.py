@@ -87,6 +87,19 @@ def run_all_solution_algorithms(problem):
         print "Solution:", sol, ": ", sat_degree
     print "---------------------------"
 
+
+    print "Finding m-best want/no_want solutions with branch_n_bound..."
+    want_items= ["meat", "12pm"]
+    no_want_items = ["whitewine"]
+    mbest_solutions = solution.get_m_best_fixed_solutions_branch_n_bound(m, want_items,no_want_items)
+    print "m best want/no_want solutions with m:",m, "are:"
+    for sol in mbest_solutions:
+        sat_degree = solution.get_joint_satisfaction_degree(sol)
+        print "Solution:", sol, ": ", sat_degree
+    print "---------------------------"
+
+
+
     print "Finding a solution with heuristic approach..."
     heuristic_solution = solution.get_heuristic_solution()
     if heuristic_solution:
