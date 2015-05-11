@@ -7,7 +7,7 @@ jam	: 15
 juice   : 8
 oatmeal : 6
 apple	: 1
-coffee  : 10
+coffee  : 4
 ham     : 7
 pancakes: 10
 syrup   : 16
