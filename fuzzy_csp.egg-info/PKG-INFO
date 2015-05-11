@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: fuzzy-csp
+Version: 0.1
+Summary: Fuzzy CSP algorithms implementation for 6.834 pset 3
+Home-page: https://github.com/pramod2/6834_pset3
+Author: Pramod Kandel, Pallavi Mishra, Manushaqe Muco
+Author-email: kandelpramod2@gmail.com, pallavim@mit.edu, manjola@mit.edu
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
