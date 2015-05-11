@@ -233,7 +233,7 @@ function get_string_response(json_response, is_init){
 			if (low_things.length == 1){
 				is_or_are = "is";
 			}else{ is_or_are = "are";}
-			stock_string = "However, "+low_things_str +" " is_or_are + " low on stock. Do you still want it?"
+			stock_string = "However, "+low_things_str +" "+ is_or_are + " low on stock. Do you still want it?"
 		}else{
 			stock_string = "Would you want it?"
 		}
