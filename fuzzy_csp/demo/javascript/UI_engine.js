@@ -133,6 +133,7 @@ function getNextPreference(send_data) {
 			give_robot_response(str_response);
 			//renew all variables
 			reset_all_variables();
+			$("#rejected_info").html("");
 			$("#yes_no_div").hide();
 			request_new_input();
 			return;
