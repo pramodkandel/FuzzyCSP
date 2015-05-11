@@ -184,6 +184,7 @@ function give_robot_response(text){
 }
 
 function stringify_sol(solution){
+	if (solution.length==1){return solution;}
 	str = "";
 	for (var i=0; i<solution.length; i++){
 		if (i == solution.length-1){ str += " and "+solution[i];}
@@ -205,6 +206,8 @@ function get_string_response(json_response, is_init){
 	
 	stock_string = "";
 
+
+	ran_out = false;
 	for (var i=0; i<stock.length; i++){
 		if (stock[i] == 0){
 			stock_string = "However, "+sol[i] + " is out of stock. Please choose another option.";
@@ -212,13 +215,27 @@ function get_string_response(json_response, is_init){
 			if (want_items.indexOf(sol[i]) > -1){
 				want_items.splice(want_items.indexOf(sol[i]),1)
 			}
-			break;
-			
-		}else if (stock[i] == 1){
-			stock_string = "However, "+sol[i] + " is low on stock. Do you still want to have it?";
-			break;
-		}else {
-			stock_string = "Would you want it?";
+			ran_out = true;
+		}
+	}
+
+	
+	if (! ran_out){
+		low_things = []
+		for (var i=0; i<stock.length; i++){
+			if (stock[i] == 1){
+				low_things.push(sol[i]);
+			}
+		}
+		if (low_things.length > 0){
+			low_things_str = stringify_sol(low_things);
+			is_or_are = "";
+			if (low_things.length == 1){
+				is_or_are = "is";
+			}else{ is_or_are = "are";}
+			stock_string = "However, "+low_things_str +" " is_or_are + " low on stock. Do you still want it?"
+		}else{
+			stock_string = "Would you want it?"
 		}
 	}
 
