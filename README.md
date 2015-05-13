@@ -29,14 +29,16 @@ Instructions on how to run the demo (located at FuzzyCSP/fuzzy_csp/demo/)
 
 0. Install the python modules flask and flask-restful.
 
-  flask          http://flask.pocoo.org/ 
+  flask:          http://flask.pocoo.org/ 
   
-  flask-restful  https://flask-restful.readthedocs.org/en/0.3.2/installation.html
+  flask-restful:  https://flask-restful.readthedocs.org/en/0.3.2/installation.html
 
 1. Install CORS plugin for chrome browser.
+
   https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
 
 2. Pull/clone the latest github project.
+
   git clone https://github.com/pramod2/FuzzyCSP/tree/master/fuzzy_csp/demo
 
 3. In the terminal, cd to the main folder where the setup.py file is. Then, run "python setup.py install". 
