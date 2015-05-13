@@ -2,15 +2,19 @@
 Group members: Manushaqe Muco, Pallavi Mishra, Pramod Kandel
 
 # 6.834_PSET3
-Fuzzy Constraint Satisfaction Problem tutorial and implementation for Cognitive Robotics (6.834) MIT
+#Fuzzy Constraint Satisfaction Problem tutorial and implementation for Cognitive Robotics (6.834) MIT
 
 Instructions to configure the project:
 
-1. Download or clone this project.
+1. Download or clone this project. 
+  
+  git clone https://github.com/pramod2/FuzzyCSP
 
-2. From the main project directory(where setup.py file is), run this in terminal: "sudo python setup.py install" . This makes sure the package installs correctly in your system.
+2. From the main project directory (where setup.py file is), run this in terminal: "sudo python setup.py install" . This makes sure the package installs correctly in your system.
 
-3a. To see an example of all the public API use, see test/fuzzy_cs_api_test.py.In the terminal,you can run it with this command: "python fuzzy_cs_api_test.py"
+3a. To see an example of all the public API use, see test/fuzzy_cs_api_test.py.
+
+qIn the terminal,you can run it with this command: "python fuzzy_cs_api_test.py"
 
 3b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py.  
 
