@@ -16,9 +16,7 @@ Instructions to configure the project:
 
 qIn the terminal,you can run it with this command: "python fuzzy_cs_api_test.py"
 
-3b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py.  
-
-Before running those files,make sure you have PyEvolve installed, and active in the shell you are running the files in. Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# .
+3b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py.  Before running these files,make sure you have PyEvolve installed, and active in the shell you are running the files in. Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# .
 
 4. Unit tests for internal functions are placed in test/fuzzy_cs_unittest.py, which you can run as well.
 
@@ -43,13 +41,13 @@ Instructions on how to run the demo (located at FuzzyCSP/fuzzy_csp/demo/)
 
 2. Pull/clone the latest github project.
 
-  git clone https://github.com/pramod2/FuzzyCSP/tree/master/fuzzy_csp/demo
+  git clone https://github.com/pramod2/FuzzyCSP
 
 3. In the terminal, cd to the main folder where the setup.py file is. Then, run "python setup.py install". 
 
 4. In the terminal, cd to demo/src, and run "python ui_server.py". Or, run the "ui_server.py" file in any other way.
 
-5. Turn on the CORS plugin, i.e. toggle it "green" (top right corner in chrome browser).
+5. In the chrome browser, turn on the CORS plugin, i.e. toggle it "green" (top right corner in chrome browser).
 
 6. Then, open UI_Basic_v2.html inside demo in the browser
 
