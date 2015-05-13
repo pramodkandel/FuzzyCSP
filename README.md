@@ -24,5 +24,14 @@ Before running those files,make sure you have PyEvolve installed, and active in 
 
 However, by running the individual files, test/n_queen_ga.py and test/university_course_selection_ga.py, we can see how the fitness is improved from one generation to the other. In this sense, every run of the algorithm prints on the screen the benchmarking results for the fitness of each generation. An example of how this looks like can be found at benchmark/n_queen_generation_benchmark.png and benchmark/university_course_selection_generation_benchmark.png
 
+===============================================
+===============================================
+#6.834_PSET4 : Instructions on how to run the demo
 
+0. Install the python modules flask and flask-restful. Also install CORS plugin for chrome browser Pallavi sent (or Google "CORS plugin for chrome", and you'll find it.
+1. Pull/clone the latest github project.
+2. In the terminal, cd to the main folder where the setup.py file is. Then, run "python setup.py install". I think it should work on all machines.
+4. In the terminal, cd to demo/src, and run "python ui_server.py". Or, run the "ui_server.py" file in any other way.
+5. Turn on the CORS plugin, i.e. toggle it "green" (top right corner in chrome browser).
+6. Then, open UI_Basic_v1.html inside demo in the browser
 
