@@ -2,7 +2,7 @@
 Group members: Manushaqe Muco, Pallavi Mishra, Pramod Kandel
 
 # 6.834_PSET3
-#Fuzzy Constraint Satisfaction Problem tutorial and implementation for Cognitive Robotics (6.834) MIT
+Fuzzy Constraint Satisfaction Problem tutorial and implementation for Cognitive Robotics (6.834) MIT
 
 Instructions to configure the project:
 
