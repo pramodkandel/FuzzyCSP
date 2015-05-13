@@ -32,5 +32,5 @@ Instructions on how to run the demo (located at FuzzyCSP/fuzzy_csp/demo/)
 2. In the terminal, cd to the main folder where the setup.py file is. Then, run "python setup.py install". I think it should work on all machines.
 4. In the terminal, cd to demo/src, and run "python ui_server.py". Or, run the "ui_server.py" file in any other way.
 5. Turn on the CORS plugin, i.e. toggle it "green" (top right corner in chrome browser).
-6. Then, open UI_Basic_v1.html inside demo in the browser
+6. Then, open UI_Basic_v2.html inside demo in the browser
 
