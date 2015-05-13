@@ -27,8 +27,10 @@ However, by running the individual files, test/n_queen_ga.py and test/university
 #6.834_PSET4 
 Instructions on how to run the demo (located at FuzzyCSP/fuzzy_csp/demo/)
 
-0. Install the python modules flask and flask-restful.  
+0. Install the python modules flask and flask-restful.
+
   flask          http://flask.pocoo.org/ 
+  
   flask-restful  https://flask-restful.readthedocs.org/en/0.3.2/installation.html
 
 1. Install CORS plugin for chrome browser.
