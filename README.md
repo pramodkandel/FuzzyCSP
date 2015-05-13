@@ -27,10 +27,21 @@ However, by running the individual files, test/n_queen_ga.py and test/university
 #6.834_PSET4 
 Instructions on how to run the demo (located at FuzzyCSP/fuzzy_csp/demo/)
 
-0. Install the python modules flask and flask-restful. Also install CORS plugin for chrome browser Pallavi sent (or Google "CORS plugin for chrome", and you'll find it.
-1. Pull/clone the latest github project.
-2. In the terminal, cd to the main folder where the setup.py file is. Then, run "python setup.py install". I think it should work on all machines.
+0. Install the python modules flask and flask-restful.  
+  flask          http://flask.pocoo.org/ 
+  flask-restful  https://flask-restful.readthedocs.org/en/0.3.2/installation.html
+
+1. Install CORS plugin for chrome browser.
+  https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
+
+2. Pull/clone the latest github project.
+  git clone https://github.com/pramod2/FuzzyCSP/tree/master/fuzzy_csp/demo
+
+3. In the terminal, cd to the main folder where the setup.py file is. Then, run "python setup.py install". 
+
 4. In the terminal, cd to demo/src, and run "python ui_server.py". Or, run the "ui_server.py" file in any other way.
+
 5. Turn on the CORS plugin, i.e. toggle it "green" (top right corner in chrome browser).
+
 6. Then, open UI_Basic_v2.html inside demo in the browser
 
