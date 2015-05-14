@@ -20,13 +20,13 @@ Instructions to configure the project:
 
   Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# 
 
-4.Unit tests for internal functions are placed in test/fuzzy_cs_unitest.py, which you can run as well.
+4. Unit tests for internal functions are placed in test/fuzzy_cs_unitest.py, which you can run as well.
 
-5.Benchmark Tests:
+5. Benchmark Tests:
 
- a. Benchmark tests are under benchmark/fuzzy_benchmark_test.py. If you run it, the results appear in a txt file in the same folder. The results compare various algorithms according to various problem metrics. For problem metrics, see the class variables of FuzzyExampleProblem in src/fuzzy_example_problem.py.
+  a. Benchmark tests are under benchmark/fuzzy_benchmark_test.py. If you run it, the results appear in a txt file in the same folder. The results compare various algorithms according to various problem metrics. For problem metrics, see the class variables of FuzzyExampleProblem in src/fuzzy_example_problem.py.
 
- b. For GA, the benchmark results appear in the FuzzyCSP-GA-Tutorial.pdf. The main metrics were runtime and the generation number at which the solution was achieved. The results compare the performance of GAs when changing various parameters (initial population, chromosome encoding, mutation/crossover probability, etc), and running the algorithms several times. Because of the nature of GA, we could not find an automatic way to plot and average the results (graphs can be found in the tutorial).
+  b. For GA, the benchmark results appear in the FuzzyCSP-GA-Tutorial.pdf. The main metrics were runtime and the generation number at which the solution was achieved. The results compare the performance of GAs when changing various parameters (initial population, chromosome encoding, mutation/crossover probability, etc), and running the algorithms several times. Because of the nature of GA, we could not find an automatic way to plot and average the results (graphs can be found in the tutorial).
 
 However, by running the individual files, test/n_queen_ga.py and test/university_course_selection_ga.py, we can see how the fitness is improved from one generation to the other. In this sense, every run of the algorithm prints on the screen the benchmarking results for the fitness of each generation. An example of how this looks like can be found at benchmark/n_queen_generation_benchmark.png and benchmark/university_course_selection_generation_benchmark.png
 
