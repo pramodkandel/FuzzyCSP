@@ -14,13 +14,15 @@ Instructions to configure the project:
 
 3.  Public API
 
-a. To see an example of all the public API use, see test/fuzzy_cs_api_test.py. In the terminal,you can run it with this command: "python fuzzy_cs_api_test.py"
+a. To see an example of all the public API use, see test/fuzzy_cs_api_test.py. In the terminal, you can run it with this command: "python fuzzy_cs_api_test.py"
 
-b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py.  Before running these files,make sure you have PyEvolve installed, and active in the shell you are running the files in. Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# .
+b. To see an example of the public API use for the Genetic Algorithms (GA), see test/n_queen_ga.py and test/university_course_selection_ga.py.Before running these files,make sure you have PyEvolve installed, and active in the shell you are running the files in. 
 
-4. Unit tests for internal functions are placed in test/fuzzy_cs_unittest.py, which you can run as well.
+Information on how to install PyEvolve can be found at: http://pyevolve.sourceforge.net/0_6rc1/intro.html# 
 
-5. Benchmark Tests
+4. Unit tests for internal functions are placed in test/fuzzy_cs_unitest.py, which you can run as well.
+
+5. Benchmark Tests:
 
  a. Benchmark tests are under benchmark/fuzzy_benchmark_test.py. If you run it, the results appear in a txt file in the same folder. The results compare various algorithms according to various problem metrics. For problem metrics, see the class variables of FuzzyExampleProblem in src/fuzzy_example_problem.py.
 
