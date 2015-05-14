@@ -42,7 +42,7 @@ Instructions on how to run the demo (located at FuzzyCSP/fuzzy_csp/demo/)
 1. Install CORS plugin for chrome browser.
 
   https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
-
+  
 2. Pull/clone the latest github project.
 
   git clone https://github.com/pramod2/FuzzyCSP
